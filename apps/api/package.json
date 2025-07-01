@@ -1,0 +1,31 @@
+{
+    "name": "api",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "clean": "rm -rf .turbo dist",
+        "dev": "tsx watch src/index.ts",
+        "start": "NODE_ENV=production node dist/index.js",
+        "build": "tsup",
+        "lint": "eslint .",
+        "check-types": "tsc --noEmit"
+    },
+    "dependencies": {
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "express": "^5.1.0",
+        "helmet": "^8.1.0",
+        "morgan": "^1.10.0"
+    },
+    "devDependencies": {
+        "@clove/env": "workspace:^",
+        "@clove/eslint-config": "workspace:^",
+        "@clove/tsconfig": "workspace:^",
+        "@types/cookie-parser": "^1.4.9",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.3",
+        "@types/morgan": "^1.9.10",
+        "tsup": "^8.5.0",
+        "tsx": "^4.20.3"
+    }
+}

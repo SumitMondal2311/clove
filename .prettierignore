@@ -1,0 +1,17 @@
+# dependencies
+node_modules
+
+# build outputs
+.turbo
+dist
+.next
+
+# misc
+.DS_Store
+
+# environment variables
+.env
+.env.*
+
+# ignore
+*ignore

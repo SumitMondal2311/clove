@@ -1,0 +1,26 @@
+# dependencies
+node_modules
+
+# build outputs
+.turbo
+dist
+.next
+
+# misc
+.DS_Store
+
+# logs
+logs
+*.log
+
+# editor
+.vscode
+
+# environment variables
+.env
+.env.*
+!.env.example
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

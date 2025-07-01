@@ -1,0 +1,27 @@
+{
+    "name": "web",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "clean": "rm -rf .turbo .next",
+        "build": "next build",
+        "dev": "next dev",
+        "start": "next start",
+        "lint": "next lint",
+        "check-types": "tsc --noEmit"
+    },
+    "dependencies": {
+        "next": "^15.3.4",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0"
+    },
+    "devDependencies": {
+        "@clove/env": "workspace:^",
+        "@clove/eslint-config": "workspace:^",
+        "@clove/tsconfig": "workspace:^",
+        "@tailwindcss/postcss": "^4.1.11",
+        "@types/node": "^20",
+        "@types/react-dom": "^19.1.6",
+        "tailwindcss": "^4.1.11"
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "$schema": "https://turborepo.com/schema.json",
+    "tasks": {
+        "dev": {
+            "dependsOn": ["^dev"],
+            "outputs": [],
+            "persistent": true
+        },
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": []
+        },
+        "web#build": {
+            "dependsOn": ["^build"],
+            "outputs": [".next/**", "!.next/cache/**"]
+        },
+        "api#build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**"]
+        },
+        "@clove/env#build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**"]
+        },
+        "start": {
+            "dependsOn": ["^start"],
+            "outputs": [],
+            "persistent": true
+        },
+        "lint": {
+            "dependsOn": ["^lint"],
+            "outputs": []
+        },
+        "clean": {
+            "dependsOn": ["^clean"],
+            "outputs": []
+        },
+        "check-types": {
+            "dependsOn": ["^check-types"],
+            "outputs": []
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "extends": "@clove/tsconfig/next",
+    "compilerOptions": {
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "paths": {
+            "@/*": ["./*"]
+        }
+    },
+    "include": [
+        "next-env.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        ".next/types/**/*.ts",
+        "postcss.config.mjs",
+        "eslint.config.mjs"
+    ],
+    "exclude": ["node_modules"]
+}

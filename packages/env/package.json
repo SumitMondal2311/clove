@@ -1,0 +1,29 @@
+{
+    "name": "@clove/env",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./web": {
+            "types": "./dist/web.d.ts",
+            "import": "./dist/web.js"
+        },
+        "./api": {
+            "types": "./dist/api.d.ts",
+            "import": "./dist/api.js"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf .turbo dist",
+        "build": "tsup",
+        "lint": "eslint .",
+        "check-types": "tsc --noEmit"
+    },
+    "dependencies": {
+        "dotenv": "^16.5.0",
+        "zod": "^3.25.67"
+    },
+    "devDependencies": {
+        "@types/node": "^20",
+        "tsup": "^8.5.0"
+    }
+}

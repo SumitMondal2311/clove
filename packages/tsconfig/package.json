@@ -1,0 +1,11 @@
+{
+    "name": "@clove/tsconfig",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./react": "./react.json",
+        "./utility": "./utility.json",
+        "./next": "./next.json",
+        "./express": "./express.json"
+    }
+}
