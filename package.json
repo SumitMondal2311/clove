@@ -2,20 +2,26 @@
     "name": "clove-monorepo",
     "private": true,
     "scripts": {
-        "check-types": "turbo run check-types",
-        "clean": "turbo run clean",
-        "build": "turbo run build",
+        "check-types": "turbo check-types",
+        "clean": "turbo clean --force",
+        "build": "turbo build",
         "build:packages": "pnpm build -F @clove/**",
-        "dev": "turbo run dev",
-        "start": "turbo run start",
-        "lint": "turbo run lint",
+        "dev": "turbo dev",
+        "start": "turbo start",
+        "lint": "turbo lint",
+        "db:generate": "turbo db:generate",
+        "db:deploy": "turbo db:deploy",
         "prepare": "husky",
         "format": "prettier --write ."
+    },
+    "dependencies": {
+        "zod": "^3.25.67"
     },
     "devDependencies": {
         "eslint": "^9.29.0",
         "husky": "^9.1.7",
         "prettier": "^3.6.2",
+        "tsup": "^8.5.0",
         "turbo": "^2.5.4",
         "typescript": "^5.8.3"
     },

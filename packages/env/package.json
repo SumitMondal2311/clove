@@ -7,6 +7,10 @@
             "types": "./dist/web.d.ts",
             "import": "./dist/web.js"
         },
+        ".": {
+            "types": "./dist/shared.d.ts",
+            "import": "./dist/shared.js"
+        },
         "./api": {
             "types": "./dist/api.d.ts",
             "import": "./dist/api.js"
@@ -19,11 +23,9 @@
         "check-types": "tsc --noEmit"
     },
     "dependencies": {
-        "dotenv": "^16.5.0",
-        "zod": "^3.25.67"
+        "dotenv": "^16.5.0"
     },
     "devDependencies": {
-        "@types/node": "^20",
-        "tsup": "^8.5.0"
+        "@types/node": "^20"
     }
 }

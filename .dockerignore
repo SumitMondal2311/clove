@@ -6,6 +6,9 @@ node_modules
 dist
 .next
 
+# misc
+.DS_Store
+
 # logs
 logs
 *.log
@@ -13,8 +16,11 @@ logs
 # coverage
 coverage
 
-# misc
-.DS_Store
+# ignore
+*ignore
+
+# editor
+.vscode
 
 # environment variables
 .env
@@ -22,9 +28,7 @@ coverage
 
 # typescript
 *.tsbuildinfo
-
-# ignore
-*ignore
+next-env.d.ts
 
 # prisma
 generated

@@ -4,6 +4,7 @@
         "dev": {
             "dependsOn": ["^dev"],
             "outputs": [],
+            "cache": false,
             "persistent": true
         },
         "build": {
@@ -22,9 +23,24 @@
             "dependsOn": ["^build"],
             "outputs": ["dist/**"]
         },
+        "@clove/database#build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**", "generated/prisma/**"]
+        },
+        "db:generate": {
+            "cache": false
+        },
+        "db:migrate": {
+            "cache": false,
+            "persistent": true
+        },
+        "db:deploy": {
+            "cache": false
+        },
         "start": {
             "dependsOn": ["^start"],
             "outputs": [],
+            "cache": false,
             "persistent": true
         },
         "lint": {

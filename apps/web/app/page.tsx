@@ -1,4 +1,4 @@
-import { env } from '@clove/env/web';
+import { env } from '@clove/env';
 
 export default function () {
     return (

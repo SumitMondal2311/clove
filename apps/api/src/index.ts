@@ -1,15 +1,15 @@
 const initialTime = new Date().getTime();
 
+import { prisma } from '@clove/database';
 import { env } from '@clove/env/api';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Express, NextFunction, Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
-import http from 'http';
 import morgan from 'morgan';
 import { API_ORIGIN } from './configs/constants';
 
-export const app: Express = express();
+export const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,16 +43,26 @@ app.use((err: AppError, _req: Request, res: Response, _next: NextFunction) => {
         message: err.message || 'Internal server error',
     });
 });
-
-const server: http.Server = app.listen(env.PORT, () => {
-    console.log(`   ✔️ Ready in ${new Date().getTime() - initialTime}ms`);
-    console.log(`   ✔️ Server ready on ${API_ORIGIN}`);
-    console.log('\n');
+const server = app.listen(env.PORT, async () => {
+    console.log(
+        `   ✔️ Server ready in ${new Date().getTime() - initialTime}ms`
+    );
+    console.log(`   ✔️ Server running on ${API_ORIGIN}`);
+    await prisma.$connect().then(() => {
+        console.log('   ✔️ Database connected\n');
+    });
 });
 
+let shutdown = false;
+
 ['SIGTERM', 'SIGINT'].forEach((signal) =>
-    process.on(signal, () => {
-        console.warn('\n   ❗️Shutting down server...');
+    process.on(signal, async () => {
+        if (shutdown) return;
+        shutdown = true;
+        await prisma.$disconnect().then(() => {
+            console.warn('\n   ❗️Database disconnected');
+        });
+        console.warn('   ❗️Shutting down server...');
         server.close(() => {
             console.warn('   ✔️ Server gracefully shut down\n');
             process.exit(0);
@@ -61,11 +71,11 @@ const server: http.Server = app.listen(env.PORT, () => {
 );
 
 process.on('unhandledRejection', (error: Error) => {
-    console.error(`Error unhandled rejection: ${error.message}`);
+    console.error(`\nError unhandled rejection: ${error.message}\n`);
     process.exit(1);
 });
 
 process.on('uncaughtException', (error: Error) => {
-    console.error(`Error uncaught exception: ${error.message}`);
+    console.error(`\nError uncaught exception: ${error.message}\n`);
     process.exit(1);
 });

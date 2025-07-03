@@ -18,6 +18,7 @@
         "morgan": "^1.10.0"
     },
     "devDependencies": {
+        "@clove/database": "workspace:^",
         "@clove/env": "workspace:^",
         "@clove/eslint-config": "workspace:^",
         "@clove/tsconfig": "workspace:^",
@@ -25,7 +26,6 @@
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.3",
         "@types/morgan": "^1.9.10",
-        "tsup": "^8.5.0",
         "tsx": "^4.20.3"
     }
 }

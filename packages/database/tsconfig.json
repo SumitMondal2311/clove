@@ -1,0 +1,9 @@
+{
+    "extends": "@clove/tsconfig/utility",
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist"
+    },
+    "include": ["src", "prisma"],
+    "exclude": ["dist", "generated"]
+}
