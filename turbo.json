@@ -27,6 +27,10 @@
             "dependsOn": ["^build"],
             "outputs": ["dist/**", "generated/prisma/**"]
         },
+        "@clove/logger#build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**"]
+        },
         "db:generate": {
             "cache": false
         },

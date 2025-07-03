@@ -2,6 +2,7 @@ const initialTime = new Date().getTime();
 
 import { prisma } from '@clove/database';
 import { env } from '@clove/env/api';
+import { logger } from '@clove/logger';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
@@ -37,19 +38,17 @@ interface AppError extends Error {
 }
 
 app.use((err: AppError, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err);
+    logger.error(err);
 
     res.status(err.status || 500).json({
         message: err.message || 'Internal server error',
     });
 });
 const server = app.listen(env.PORT, async () => {
-    console.log(
-        `   ✔️ Server ready in ${new Date().getTime() - initialTime}ms`
-    );
-    console.log(`   ✔️ Server running on ${API_ORIGIN}`);
+    logger.info(`Server ready in ${new Date().getTime() - initialTime}ms`);
+    logger.info(`Server running on ${API_ORIGIN}`);
     await prisma.$connect().then(() => {
-        console.log('   ✔️ Database connected\n');
+        logger.info('Database connected successfully');
     });
 });
 
@@ -60,22 +59,22 @@ let shutdown = false;
         if (shutdown) return;
         shutdown = true;
         await prisma.$disconnect().then(() => {
-            console.warn('\n   ❗️Database disconnected');
+            logger.warn('Database successfully disconnected');
         });
-        console.warn('   ❗️Shutting down server...');
+        logger.warn('Shutting down server...');
         server.close(() => {
-            console.warn('   ✔️ Server gracefully shut down\n');
+            logger.info('Server gracefully shut down');
             process.exit(0);
         });
     })
 );
 
 process.on('unhandledRejection', (error: Error) => {
-    console.error(`\nError unhandled rejection: ${error.message}\n`);
+    logger.error(`\nError unhandled rejection: ${error.message}\n`);
     process.exit(1);
 });
 
 process.on('uncaughtException', (error: Error) => {
-    console.error(`\nError uncaught exception: ${error.message}\n`);
+    logger.error(`\nError uncaught exception: ${error.message}\n`);
     process.exit(1);
 });

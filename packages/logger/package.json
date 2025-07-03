@@ -1,0 +1,23 @@
+{
+    "name": "@clove/logger",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc",
+        "lint": "eslint ."
+    },
+    "devDependencies": {
+        "@clove/env": "workspace:^",
+        "@clove/eslint-config": "workspace:^",
+        "@clove/tsconfig": "workspace:^"
+    },
+    "dependencies": {
+        "winston": "^3.17.0"
+    }
+}

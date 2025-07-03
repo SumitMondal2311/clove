@@ -1,9 +1,9 @@
-import { env } from '@clove/env';
+import { sharedEnv } from '@clove/env/shared';
 
 export default function () {
     return (
         <div className="h-screen flex items-center justify-center">
-            Web is running in {env.NODE_ENV} mode
+            Web is running in {sharedEnv.NODE_ENV} mode
         </div>
     );
 }

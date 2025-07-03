@@ -7,7 +7,7 @@
             "types": "./dist/web.d.ts",
             "import": "./dist/web.js"
         },
-        ".": {
+        "./shared": {
             "types": "./dist/shared.d.ts",
             "import": "./dist/shared.js"
         },
@@ -26,6 +26,8 @@
         "dotenv": "^16.5.0"
     },
     "devDependencies": {
+        "@clove/eslint-config": "workspace:^",
+        "@clove/tsconfig": "workspace:^",
         "@types/node": "^20"
     }
 }

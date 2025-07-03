@@ -15,12 +15,15 @@
         "cors": "^2.8.5",
         "express": "^5.1.0",
         "helmet": "^8.1.0",
-        "morgan": "^1.10.0"
+        "morgan": "^1.10.0",
+        "winston": "^3.17.0",
+        "winston-daily-rotate-file": "^5.0.0"
     },
     "devDependencies": {
         "@clove/database": "workspace:^",
         "@clove/env": "workspace:^",
         "@clove/eslint-config": "workspace:^",
+        "@clove/logger": "workspace:^",
         "@clove/tsconfig": "workspace:^",
         "@types/cookie-parser": "^1.4.9",
         "@types/cors": "^2.8.19",
