@@ -9,10 +9,13 @@
         "dev": "turbo dev",
         "start": "turbo start",
         "lint": "turbo lint",
-        "db:generate": "turbo db:generate",
-        "db:deploy": "turbo db:deploy",
         "prepare": "husky",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "db:generate": "turbo db:generate",
+        "db:deploy": "turbo db:deploy"
+    },
+    "lint-staged": {
+        "*.{js,ts,jsx,tsx,json,md,yaml,yml}": "prettier --write"
     },
     "dependencies": {
         "zod": "^3.25.67"
@@ -20,6 +23,7 @@
     "devDependencies": {
         "eslint": "^9.29.0",
         "husky": "^9.1.7",
+        "lint-staged": "^16.1.2",
         "prettier": "^3.6.2",
         "turbo": "^2.5.4",
         "typescript": "^5.8.3"

@@ -23,9 +23,6 @@ coverage
 # typescript
 *.tsbuildinfo
 
-# ignore
-*ignore
-
 # prisma
 generated
 migrations
