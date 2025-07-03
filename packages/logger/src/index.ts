@@ -1,4 +1,3 @@
-import { sharedEnv } from '@clove/env/shared';
 import { config, createLogger, format, transports } from 'winston';
 
 const customTimestamp = format.timestamp({
@@ -11,7 +10,7 @@ const customPrintf = format.printf(({ level, message, timestamp }) => {
 
 export const logger = createLogger({
     format:
-        sharedEnv.NODE_ENV === 'production'
+        process.env.NODE_ENV === 'production'
             ? format.combine(
                   customTimestamp,
                   customPrintf,

@@ -18,7 +18,7 @@
     },
     "scripts": {
         "clean": "rm -rf .turbo dist",
-        "build": "tsup",
+        "build": "tsc",
         "lint": "eslint .",
         "check-types": "tsc --noEmit"
     },
@@ -27,6 +27,7 @@
     },
     "devDependencies": {
         "@clove/eslint-config": "workspace:^",
+        "@clove/logger": "workspace:^",
         "@clove/tsconfig": "workspace:^",
         "@types/node": "^20"
     }

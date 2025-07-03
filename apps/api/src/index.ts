@@ -8,7 +8,7 @@ import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import { API_ORIGIN } from './configs/constants';
+import { API_ORIGIN } from './configs/constants.js';
 
 export const app = express();
 

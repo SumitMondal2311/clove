@@ -6,7 +6,7 @@
         "clean": "rm -rf .turbo dist",
         "dev": "tsx watch src/index.ts",
         "start": "NODE_ENV=production node dist/index.js",
-        "build": "tsup",
+        "build": "tsc",
         "lint": "eslint .",
         "check-types": "tsc --noEmit"
     },

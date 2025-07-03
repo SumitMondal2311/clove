@@ -13,7 +13,6 @@
         "lint": "eslint ."
     },
     "devDependencies": {
-        "@clove/env": "workspace:^",
         "@clove/eslint-config": "workspace:^",
         "@clove/tsconfig": "workspace:^"
     },
