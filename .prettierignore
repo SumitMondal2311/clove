@@ -1,0 +1,42 @@
+# dependencies
+node_modules
+
+# build outputs
+dist
+build
+out
+
+# turbo
+.turbo
+
+# next
+.next
+
+# vercel
+.vercel
+
+# logs
+logs
+*.log
+
+# ignore files
+*ignore
+
+# debug
+*-debug*
+debug
+*.debug
+debugs
+
+# testing
+coverage
+
+# misc
+.DS_Store
+*.pem
+
+# env
+.env.*
+
+# typescript
+*.tsbuildinfo
