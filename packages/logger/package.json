@@ -1,0 +1,26 @@
+{
+    "name": "@clove/logger",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf .turbo dist",
+        "prebuild": "pnpm clean",
+        "build": "tsup",
+        "lint": "eslint .",
+        "check-types": "tsc --noEmit"
+    },
+    "dependencies": {
+        "pino": "^9.7.0"
+    },
+    "devDependencies": {
+        "@clove/eslint": "workspace:^",
+        "@clove/tsconfig": "workspace:^",
+        "pino-pretty": "^13.0.0"
+    }
+}

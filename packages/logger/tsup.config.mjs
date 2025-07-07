@@ -1,9 +1,9 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-    entry: ['src/server.ts'],
-    format: ['esm'],
+    entry: ['src/index.ts'],
     outDir: 'dist',
+    dts: true,
+    format: ['esm'],
     clean: true,
-    external: ['dotenv', '@clove/logger'],
 });

@@ -9,6 +9,15 @@
             "dependsOn": ["^build"],
             "outputs": [".next/**", "!.next/cache/**"]
         },
+        "api#build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**"],
+            "env": ["NODE_ENV", "PORT", "WEB_ORIGIN", "API_ORIGIN"]
+        },
+        "@clove/logger#build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**"]
+        },
         "clean": {
             "dependsOn": ["^clean"],
             "cache": false

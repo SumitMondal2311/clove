@@ -1,5 +1,5 @@
 {
-    "extends": "@clove/tsconfig/node",
+    "extends": "@clove/tsconfig/utility",
     "compilerOptions": {
         "rootDir": "./src",
         "outDir": "./dist"

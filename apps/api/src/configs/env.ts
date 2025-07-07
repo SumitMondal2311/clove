@@ -1,3 +1,4 @@
+import { logger } from '@clove/logger';
 import { config } from 'dotenv';
 import path from 'path';
 import { z } from 'zod';
@@ -22,7 +23,7 @@ export const parsedSchema = z
 
 if (!parsedSchema.success) {
     parsedSchema.error.issues.forEach((issue) => {
-        console.error(`Invalid or missing ${issue.path} variable`);
+        logger.error(`Invalid or missing ${issue.path} variable`);
     });
     process.exit(1);
 }

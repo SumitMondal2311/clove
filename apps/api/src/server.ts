@@ -1,5 +1,6 @@
 const initialTime = new Date().getTime();
 
+import { logger } from '@clove/logger';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
@@ -35,32 +36,32 @@ interface AppError extends Error {
 }
 
 app.use((err: AppError, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err);
+    logger.error(err);
     res.status(err.status || 500).json({
         message: err.message || 'Internal server error',
     });
 });
 
 const server = app.listen(env.PORT, () => {
-    console.log(`✔️ Ready in ${new Date().getTime() - initialTime}ms`);
-    console.log(`✔️ Server running on ${env.API_ORIGIN}`);
+    logger.info(`Ready in ${new Date().getTime() - initialTime}ms`);
+    logger.info(`Server running on ${env.API_ORIGIN}`);
 });
 
 ['SIGTERM', 'SIGINT'].forEach((signal) => {
     process.on(signal, () => {
         server.close(() => {
-            console.log('✔️ Server gracefully shut down');
+            logger.info('Server gracefully shut down');
             process.exit(0);
         });
     });
 });
 
 process.on('unhandledRejection', (error: Error) => {
-    console.error(`Error unhandled rejection: ${error.message}`);
+    logger.error(`Error unhandled rejection: ${error.message}`);
     process.exit(1);
 });
 
 process.on('uncaughtException', (error: Error) => {
-    console.error(`Error uncaught exception: ${error.message}`);
+    logger.error(`Error uncaught exception: ${error.message}`);
     process.exit(1);
 });
