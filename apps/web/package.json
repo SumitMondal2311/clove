@@ -5,6 +5,7 @@
     "scripts": {
         "clean": "rm -rf .turbo .next",
         "dev": "next dev",
+        "prebuild": "pnpm clean",
         "build": "next build",
         "start": "next start",
         "lint": "next lint",

@@ -1,0 +1,9 @@
+{
+    "extends": "@clove/tsconfig/node",
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist"
+    },
+    "include": ["src", "eslint.config.mjs", "tsup.config.mjs"],
+    "exclude": ["node_modules", "dist"]
+}

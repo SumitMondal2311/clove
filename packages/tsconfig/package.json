@@ -3,6 +3,7 @@
     "private": true,
     "type": "module",
     "exports": {
-        "./next": "./next.json"
+        "./next": "./next.json",
+        "./node": "./node.json"
     }
 }

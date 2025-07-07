@@ -1,0 +1,66 @@
+const initialTime = new Date().getTime();
+
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express, { NextFunction, Request, Response } from 'express';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import { env } from './configs/env.js';
+
+export const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+app.use(
+    cors({
+        origin: env.WEB_ORIGIN,
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    })
+);
+
+app.use(helmet());
+app.use(morgan('dev'));
+
+app.get('/health', (_req: Request, res: Response) => {
+    res.status(200).json({
+        message: 'OK',
+    });
+});
+
+interface AppError extends Error {
+    status?: number;
+}
+
+app.use((err: AppError, _req: Request, res: Response, _next: NextFunction) => {
+    console.error(err);
+    res.status(err.status || 500).json({
+        message: err.message || 'Internal server error',
+    });
+});
+
+const server = app.listen(env.PORT, () => {
+    console.log(`✔️ Ready in ${new Date().getTime() - initialTime}ms`);
+    console.log(`✔️ Server running on ${env.API_ORIGIN}`);
+});
+
+['SIGTERM', 'SIGINT'].forEach((signal) => {
+    process.on(signal, () => {
+        server.close(() => {
+            console.log('✔️ Server gracefully shut down');
+            process.exit(0);
+        });
+    });
+});
+
+process.on('unhandledRejection', (error: Error) => {
+    console.error(`Error unhandled rejection: ${error.message}`);
+    process.exit(1);
+});
+
+process.on('uncaughtException', (error: Error) => {
+    console.error(`Error uncaught exception: ${error.message}`);
+    process.exit(1);
+});
