@@ -2,18 +2,26 @@
     "name": "clove-monorepo",
     "private": true,
     "scripts": {
+        "check-types": "turbo check-types",
         "format": "prettier --write .",
+        "prepare": "husky",
+        "build": "turbo build",
+        "dev": "turbo dev",
+        "start": "turbo start",
+        "lint": "turbo lint",
         "lint-staged": "lint-staged",
-        "prepare": "husky"
+        "clean": "turbo clean"
     },
     "lint-staged": {
         "*.{js,ts,jsx,tsx,json}": "prettier --write"
     },
     "devDependencies": {
+        "eslint": "^9.30.1",
         "husky": "^9.1.7",
         "lint-staged": "^16.1.2",
         "prettier": "^3.6.2",
-        "turbo": "^2.5.4"
+        "turbo": "^2.5.4",
+        "typescript": "^5.8.3"
     },
     "packageManager": "pnpm@9.0.0",
     "engines": {
