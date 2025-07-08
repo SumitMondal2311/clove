@@ -1,0 +1,30 @@
+{
+    "name": "@clove/database",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf .turbo dist generated",
+        "db:generate": "prisma generate",
+        "db:format": "prisma format",
+        "db:migrate": "prisma migrate dev --skip-generate",
+        "db:deploy": "prisma migrate deploy",
+        "lint": "eslint .",
+        "pre-build": "pnpm clean",
+        "build": "tsc",
+        "check-types": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "@clove/eslint": "workspace:^",
+        "@clove/tsconfig": "workspace:^",
+        "prisma": "^6.11.0"
+    },
+    "dependencies": {
+        "@prisma/client": "6.11.0"
+    }
+}

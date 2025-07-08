@@ -1,0 +1,29 @@
+services:
+    postgres_test:
+        image: postgres:17-alpine
+        restart: unless-stopped
+        ports:
+            - 5402:5432
+        environment:
+            POSTGRES_INITDB_ARGS: --encoding=UTF-8
+            POSTGRES_USER: user_test
+            POSTGRES_PASSWORD: password_test
+            POSTGRES_DB: clove_test
+        volumes:
+            - pgdata_test:/var/lib/postgresql/data
+
+    postgres_dev:
+        image: postgres:17-alpine
+        restart: unless-stopped
+        ports:
+            - 5401:5432
+        environment:
+            POSTGRES_INITDB_ARGS: --encoding=UTF-8
+            POSTGRES_USER: user_dev
+            POSTGRES_PASSWORD: password_dev
+            POSTGRES_DB: clove_dev
+        volumes:
+            - pgdata_dev:/var/lib/postgresql/data
+volumes:
+    pgdata_test:
+    pgdata_dev:

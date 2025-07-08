@@ -12,9 +12,9 @@
         "api#build": {
             "dependsOn": ["^build"],
             "outputs": ["dist/**"],
-            "env": ["NODE_ENV", "PORT", "WEB_ORIGIN", "API_ORIGIN"]
+            "env": ["NODE_ENV", "PORT", "DATABASE_URL", "WEB_ORIGIN", "API_ORIGIN"]
         },
-        "@clove/logger#build": {
+        "@clove/**#build": {
             "dependsOn": ["^build"],
             "outputs": ["dist/**"]
         },

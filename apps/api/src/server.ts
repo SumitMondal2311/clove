@@ -1,5 +1,6 @@
 const initialTime = new Date().getTime();
 
+import { prisma } from '@clove/database';
 import { logger } from '@clove/logger';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -42,14 +43,20 @@ app.use((err: AppError, _req: Request, res: Response, _next: NextFunction) => {
     });
 });
 
-const server = app.listen(env.PORT, () => {
+const server = app.listen(env.PORT, async () => {
     logger.info(`Ready in ${new Date().getTime() - initialTime}ms`);
     logger.info(`Server running on ${env.API_ORIGIN}`);
+    await prisma.$connect().then(() => {
+        logger.info('Database connected successfully');
+    });
 });
 
 ['SIGTERM', 'SIGINT'].forEach((signal) => {
     process.on(signal, () => {
-        server.close(() => {
+        server.close(async () => {
+            await prisma.$disconnect().then(() => {
+                logger.info('Database disconnected successfully');
+            });
             logger.info('Server gracefully shut down');
             process.exit(0);
         });

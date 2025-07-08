@@ -20,6 +20,7 @@
         "zod": "^3.25.75"
     },
     "devDependencies": {
+        "@clove/database": "workspace:^",
         "@clove/eslint": "workspace:^",
         "@clove/logger": "workspace:^",
         "@clove/tsconfig": "workspace:^",

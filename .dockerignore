@@ -35,14 +35,6 @@ coverage
 
 # env
 .env.*
-!.env.example
-
-# editor
-.vscode
 
 # typescript
 *.tsbuildinfo
-
-# prisma
-generated
-generated/prisma/*

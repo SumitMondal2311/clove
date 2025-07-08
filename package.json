@@ -4,11 +4,10 @@
     "scripts": {
         "check-types": "turbo check-types",
         "format": "prettier --write .",
-        "prepare": "husky",
         "build": "turbo build",
-        "build:packages": "turbo build -F @clove/**",
         "dev": "turbo dev",
         "start": "turbo start",
+        "prepare": "husky",
         "lint": "turbo lint",
         "lint-staged": "lint-staged",
         "clean": "turbo clean"
