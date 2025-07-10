@@ -10,13 +10,15 @@
     },
     "scripts": {
         "clean": "rm -rf .turbo dist generated",
-        "db:generate": "prisma generate",
-        "db:format": "prisma format",
-        "db:migrate": "prisma migrate dev --skip-generate",
-        "db:deploy": "prisma migrate deploy",
-        "lint": "eslint .",
+        "migrate": "prisma migrate dev --skip-generate",
+        "deploy": "prisma migrate deploy",
+        "generate": "prisma generate",
+        "format": "prisma format",
         "pre-build": "pnpm clean",
+        "lint": "eslint .",
         "build": "tsc",
+        "studio": "prisma studio",
+        "push": "prisma db push",
         "check-types": "tsc --noEmit"
     },
     "devDependencies": {

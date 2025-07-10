@@ -29,12 +29,16 @@ debugs
 # testing
 coverage
 
+# prisma
+generated
+
 # misc
 .DS_Store
 *.pem
 
 # env
 .env.*
+.env
 !.env.example
 
 # editor
@@ -42,7 +46,3 @@ coverage
 
 # typescript
 *.tsbuildinfo
-
-# prisma
-generated
-generated/prisma/*

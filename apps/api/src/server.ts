@@ -7,7 +7,9 @@ import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import { ApiError } from './configs/api-error.js';
 import { env } from './configs/env.js';
+import { authRouter } from './routes/auth.route.js';
 
 export const app = express();
 
@@ -32,13 +34,11 @@ app.get('/health', (_req: Request, res: Response) => {
     });
 });
 
-interface AppError extends Error {
-    status?: number;
-}
+app.use('/api/auth', authRouter);
 
-app.use((err: AppError, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
     logger.error(err);
-    res.status(err.status || 500).json({
+    res.status(err.statusCode || 500).json({
         message: err.message || 'Internal server error',
     });
 });

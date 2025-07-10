@@ -11,9 +11,9 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  name      String
   email     String   @unique
   password  String
+  verfied   Boolean  @default(false)
 
   sessions Session[]
 
@@ -21,18 +21,18 @@ model User {
 }
 
 model Session {
-  id             Int      @id @default(autoincrement())
-  userAgent      String
-  refToken       String   @unique
-  refTokenSecret String   @unique
-  ipAddress      String?
-  revoked        Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  expiresAt      DateTime
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  userAgent    String?
+  ipAddress    String?
+  refreshToken String
+  revoked      Boolean   @default(false)
+  revokedAt    DateTime?
+  expiresAt    DateTime
 
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 
-  @@index([userId])
+  @@unique([userId, refreshToken])
   @@map("sessions")
 }

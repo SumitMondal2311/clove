@@ -2,8 +2,11 @@
     "name": "clove-monorepo",
     "private": true,
     "scripts": {
+        "test:integration": "turbo test:integration",
+        "test:unit": "turbo test:unit",
         "check-types": "turbo check-types",
         "format": "prettier --write .",
+        "build:packages": "turbo build -F @clove/**",
         "build": "turbo build",
         "dev": "turbo dev",
         "start": "turbo start",
@@ -25,7 +28,7 @@
         "turbo": "^2.5.4",
         "typescript": "^5.8.3"
     },
-    "packageManager": "pnpm@9.0.0",
+    "packageManager": "pnpm@10.13.1",
     "engines": {
         "node": ">=18"
     }

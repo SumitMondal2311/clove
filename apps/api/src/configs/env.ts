@@ -13,6 +13,7 @@ export const parsedSchema = z
         PORT: z.string().min(4).transform(Number),
         WEB_ORIGIN: z.string().url(),
         API_ORIGIN: z.string().url().optional(),
+        JWT_SECRET: z.string().base64(),
     })
     .superRefine((env) => {
         if (env.NODE_ENV !== 'production') {

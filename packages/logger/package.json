@@ -11,7 +11,7 @@
     "scripts": {
         "clean": "rm -rf .turbo dist",
         "prebuild": "pnpm clean",
-        "build": "tsup",
+        "build": "tsc",
         "lint": "eslint .",
         "check-types": "tsc --noEmit"
     },

@@ -12,9 +12,16 @@
         "api#build": {
             "dependsOn": ["^build"],
             "outputs": ["dist/**"],
-            "env": ["NODE_ENV", "PORT", "DATABASE_URL", "WEB_ORIGIN", "API_ORIGIN"]
+            "env": ["NODE_ENV", "PORT", "DATABASE_URL", "WEB_ORIGIN", "API_ORIGIN", "JWT_SECRET"]
         },
-        "@clove/**#build": {
+        "@clove/database#generate": {
+            "outputs": ["generated/**"]
+        },
+        "@clove/database#build": {
+            "dependsOn": ["generate", "^build"],
+            "outputs": ["dist/**"]
+        },
+        "@clove/logger#build": {
             "dependsOn": ["^build"],
             "outputs": ["dist/**"]
         },
@@ -37,6 +44,12 @@
         },
         "check-types": {
             "dependsOn": ["^check-types"]
+        },
+        "test:unit": {
+            "dependsOn": ["^test:unit"]
+        },
+        "test:integration": {
+            "dependsOn": ["^test:integration"]
         }
     }
 }

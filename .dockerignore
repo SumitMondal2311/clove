@@ -29,12 +29,16 @@ debugs
 # testing
 coverage
 
+# prisma
+generated
+
 # misc
 .DS_Store
 *.pem
 
 # env
 .env.*
+.env
 
 # typescript
 *.tsbuildinfo

@@ -11,4 +11,9 @@ export const config = [
     js.configs.recommended,
     prettier,
     ...tseslint.configs.recommended,
+    {
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
+        },
+    },
 ];

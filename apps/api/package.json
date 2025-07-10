@@ -3,19 +3,24 @@
     "name": "api",
     "type": "module",
     "scripts": {
-        "clean": "rm -rf .turbo dist",
-        "prebuild": "pnpm clean",
         "build": "cross-env NODE_ENV=production tsup",
         "start": "cross-env NODE_ENV=production node dist/server.js",
         "dev": "tsx watch src/server.ts",
+        "test:integration": "vitest run tests/integration",
+        "test:unit": "vitest run tests/unit",
+        "test:coverage": "vitest run --coverage",
+        "clean": "rm -rf .turbo dist",
         "lint": "eslint .",
-        "check-types": "tsc --noEmit"
+        "check-types": "tsc --noEmit",
+        "prebuild": "pnpm clean"
     },
     "dependencies": {
+        "bcryptjs": "^3.0.2",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
         "express": "^5.1.0",
         "helmet": "^8.1.0",
+        "jsonwebtoken": "^9.0.2",
         "morgan": "^1.10.0",
         "zod": "^3.25.75"
     },
@@ -27,6 +32,7 @@
         "@types/cookie-parser": "^1.4.9",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.3",
+        "@types/jsonwebtoken": "^9.0.10",
         "@types/morgan": "^1.9.10",
         "cross-env": "^7.0.3",
         "dotenv": "^17.0.1",
