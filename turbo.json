@@ -14,8 +14,16 @@
             "outputs": ["dist/**"],
             "env": ["NODE_ENV", "PORT", "DATABASE_URL", "WEB_ORIGIN", "API_ORIGIN", "JWT_SECRET"]
         },
-        "@clove/database#generate": {
+        "generate": {
+            "cache": false,
             "outputs": ["generated/**"]
+        },
+        "db:deploy": {
+            "cache": false,
+            "persistent": true
+        },
+        "db:migrate": {
+            "cache": false
         },
         "@clove/database#build": {
             "dependsOn": ["generate", "^build"],
@@ -43,7 +51,7 @@
             "dependsOn": ["^lint"]
         },
         "check-types": {
-            "dependsOn": ["^check-types"]
+            "dependsOn": ["generate", "^check-types"]
         },
         "test:unit": {
             "dependsOn": ["^test:unit"]

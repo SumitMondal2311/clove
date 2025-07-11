@@ -1,6 +1,5 @@
 const initialTime = new Date().getTime();
 
-import { prisma } from '@clove/database';
 import { logger } from '@clove/logger';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -9,6 +8,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { ApiError } from './configs/api-error.js';
 import { env } from './configs/env.js';
+import { prisma } from './lib/prisma.js';
 import { authRouter } from './routes/auth.route.js';
 
 export const app = express();
@@ -65,10 +65,10 @@ const server = app.listen(env.PORT, async () => {
 
 process.on('unhandledRejection', (error: Error) => {
     logger.error(`Error unhandled rejection: ${error.message}`);
-    process.exit(1);
+    throw error;
 });
 
 process.on('uncaughtException', (error: Error) => {
     logger.error(`Error uncaught exception: ${error.message}`);
-    process.exit(1);
+    throw error;
 });

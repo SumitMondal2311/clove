@@ -1,4 +1,4 @@
-import { prisma } from '@clove/database';
+import { prisma } from '../src/lib/prisma.js';
 import { afterAll, beforeAll } from 'vitest';
 
 beforeAll(async () => {

@@ -1,18 +1,18 @@
 {
-    "private": true,
     "name": "api",
+    "private": true,
     "type": "module",
     "scripts": {
+        "prebuild": "pnpm clean",
         "build": "cross-env NODE_ENV=production tsup",
-        "start": "cross-env NODE_ENV=production node dist/server.js",
-        "dev": "tsx watch src/server.ts",
-        "test:integration": "vitest run tests/integration",
-        "test:unit": "vitest run tests/unit",
-        "test:coverage": "vitest run --coverage",
-        "clean": "rm -rf .turbo dist",
-        "lint": "eslint .",
         "check-types": "tsc --noEmit",
-        "prebuild": "pnpm clean"
+        "clean": "rm -rf .turbo dist",
+        "dev": "tsx watch src/server.ts",
+        "lint": "eslint .",
+        "start": "cross-env NODE_ENV=production node dist/server.js",
+        "test:coverage": "vitest run --coverage",
+        "test:integration": "vitest run tests/integration",
+        "test:unit": "vitest run tests/unit"
     },
     "dependencies": {
         "bcryptjs": "^3.0.2",

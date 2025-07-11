@@ -9,24 +9,25 @@
         }
     },
     "scripts": {
-        "clean": "rm -rf .turbo dist generated",
-        "migrate": "prisma migrate dev --skip-generate",
-        "deploy": "prisma migrate deploy",
-        "generate": "prisma generate",
-        "format": "prisma format",
-        "pre-build": "pnpm clean",
-        "lint": "eslint .",
         "build": "tsc",
-        "studio": "prisma studio",
-        "push": "prisma db push",
-        "check-types": "tsc --noEmit"
+        "check-types": "tsc --noEmit",
+        "clean": "rm -rf .turbo dist generated",
+        "db:deploy": "dotenv -e .env.production prisma migrate deploy",
+        "db:format": "prisma format",
+        "db:migrate": "dotenv -e .env.development prisma migrate dev --skip-generate",
+        "db:push": "dotenv -e .env.development prisma db push && dotenv -e .env.test prisma db push",
+        "db:studio": "dotenv -e .env.development prisma studio",
+        "generate": "dotenv -e .env.development prisma generate && dotenv -e .env.test prisma generate",
+        "lint": "eslint .",
+        "pre-build": "pnpm clean"
+    },
+    "dependencies": {
+        "@prisma/client": "6.11.0"
     },
     "devDependencies": {
         "@clove/eslint": "workspace:^",
         "@clove/tsconfig": "workspace:^",
+        "dotenv-cli": "^8.0.0",
         "prisma": "^6.11.0"
-    },
-    "dependencies": {
-        "@prisma/client": "6.11.0"
     }
 }

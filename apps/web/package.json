@@ -1,15 +1,15 @@
 {
-    "private": true,
     "name": "web",
+    "private": true,
     "type": "module",
     "scripts": {
-        "clean": "rm -rf .turbo .next",
-        "dev": "next dev",
         "prebuild": "pnpm clean",
         "build": "next build",
-        "start": "next start",
+        "check-types": "tsc --noEmit",
+        "clean": "rm -rf .turbo .next",
+        "dev": "next dev",
         "lint": "next lint",
-        "check-types": "tsc --noEmit"
+        "start": "next start"
     },
     "dependencies": {
         "next": "15.3.5",

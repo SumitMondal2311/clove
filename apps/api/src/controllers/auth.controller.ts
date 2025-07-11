@@ -1,4 +1,3 @@
-import { prisma } from '@clove/database';
 import { compare, hash } from 'bcryptjs';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
@@ -11,6 +10,7 @@ import {
 } from '../configs/constants.js';
 import { env } from '../configs/env.js';
 import { loginSchema, signupSchema } from '../configs/schemas';
+import { prisma } from '../lib/prisma.js';
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
     const parsedSchema = signupSchema.safeParse(req.body);

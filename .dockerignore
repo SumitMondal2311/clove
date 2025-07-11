@@ -28,6 +28,8 @@ debugs
 
 # testing
 coverage
+*.test.ts
+*.spec.ts
 
 # prisma
 generated

@@ -2,28 +2,33 @@
     "name": "clove-monorepo",
     "private": true,
     "scripts": {
-        "test:integration": "turbo test:integration",
-        "test:unit": "turbo test:unit",
-        "check-types": "turbo check-types",
-        "format": "prettier --write .",
-        "build:packages": "turbo build -F @clove/**",
         "build": "turbo build",
+        "build:packages": "turbo build -F @clove/**",
+        "check-types": "turbo check-types",
+        "clean": "turbo clean",
         "dev": "turbo dev",
-        "start": "turbo start",
-        "prepare": "husky",
+        "format": "prettier --write .",
+        "format:package-json": "sort-package-json package.json apps/**/package.json packages/**/package.json",
         "lint": "turbo lint",
         "lint-staged": "lint-staged",
-        "clean": "turbo clean"
+        "prepare": "husky",
+        "prettier-check": "prettier --check .",
+        "start": "turbo start",
+        "test:integration": "turbo test:integration --force"
     },
     "lint-staged": {
-        "*.{js,ts,jsx,tsx,json}": "prettier --write"
+        "package.json": "sort-package-json",
+        "packages/**/package.json": "sort-package-json",
+        "apps/**/package.json": "sort-package-json",
+        "**/*.{js,mjs,ts,jsx,tsx,json,yaml,yml}": "prettier --write"
     },
     "devDependencies": {
-        "@types/node": "^20.19.4",
+        "@types/node": "^20.19.7",
         "eslint": "^9.30.1",
         "husky": "^9.1.7",
         "lint-staged": "^16.1.2",
         "prettier": "^3.6.2",
+        "sort-package-json": "^3.4.0",
         "tsup": "^8.5.0",
         "turbo": "^2.5.4",
         "typescript": "^5.8.3"

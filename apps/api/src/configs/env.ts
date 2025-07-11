@@ -9,9 +9,10 @@ config({
 
 export const parsedSchema = z
     .object({
+        WEB_ORIGIN: z.string().url(),
         NODE_ENV: z.enum(['development', 'test', 'production']),
         PORT: z.string().min(4).transform(Number),
-        WEB_ORIGIN: z.string().url(),
+        DATABASE_URL: z.string().url(),
         API_ORIGIN: z.string().url().optional(),
         JWT_SECRET: z.string().base64(),
     })
@@ -26,7 +27,7 @@ if (!parsedSchema.success) {
     parsedSchema.error.issues.forEach((issue) => {
         logger.error(`Invalid or missing ${issue.path} variable`);
     });
-    process.exit(1);
+    throw new Error('Invalid or missing environment variable(s)');
 }
 
 export const env = parsedSchema.data;

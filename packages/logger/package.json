@@ -9,11 +9,11 @@
         }
     },
     "scripts": {
-        "clean": "rm -rf .turbo dist",
         "prebuild": "pnpm clean",
         "build": "tsc",
-        "lint": "eslint .",
-        "check-types": "tsc --noEmit"
+        "check-types": "tsc --noEmit",
+        "clean": "rm -rf .turbo dist",
+        "lint": "eslint ."
     },
     "dependencies": {
         "pino": "^9.7.0"
