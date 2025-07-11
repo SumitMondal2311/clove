@@ -9,11 +9,11 @@ config({
 
 export const parsedSchema = z
     .object({
+        API_ORIGIN: z.string().url().optional(),
         WEB_ORIGIN: z.string().url(),
         NODE_ENV: z.enum(['development', 'test', 'production']),
         PORT: z.string().min(4).transform(Number),
-        DATABASE_URL: z.string().url(),
-        API_ORIGIN: z.string().url().optional(),
+        DATABASE_URL: z.string().startsWith('postgresql://'),
         JWT_SECRET: z.string().base64(),
     })
     .superRefine((env) => {
@@ -27,7 +27,7 @@ if (!parsedSchema.success) {
     parsedSchema.error.issues.forEach((issue) => {
         logger.error(`Invalid or missing ${issue.path} variable`);
     });
-    throw new Error('Invalid or missing environment variable(s)');
+    throw parsedSchema.error;
 }
 
 export const env = parsedSchema.data;

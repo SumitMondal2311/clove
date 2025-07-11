@@ -1,0 +1,58 @@
+name: CI
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+        services:
+            postgres:
+                image: postgres:17-alpine
+                ports:
+                    - 5432:5432
+                env:
+                    POSTGRES_INITDB_ARGS: --encoding=UTF-8
+                    POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+                    POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+                    POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+                options: >-
+                    --health-cmd="pg_isready"
+                    --health-timeout=5s
+                    --health-interval=10s
+                    --health-retries=5
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up PNPM@10
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 10
+            - name: Set up Node.js@22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: 'pnpm'
+            - name: Install dependencies
+              run: pnpm install
+            - name: Set up environment variables
+              run: |
+                  echo "WEB_ORIGIN=http://localhost:3000" >> apps/api/.env.test
+                  echo "NODE_ENV=test" >> apps/api/.env.test
+                  echo "PORT=${{ secrets.PORT }}" >> apps/api/.env.test
+                  for file in apps/api/.env.test packages/database/.env.test; do
+                    echo "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}" >> $file
+                  done
+                  echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> apps/api/.env.test
+            - run: pnpm build
+            - run: pnpm prettier-check
+            - run: pnpm lint
+            - run: pnpm check-types
+            - name: Generate client
+              run: pnpm -F @clove/database run db:generate-test
+            - name: Push schemas to DB
+              run: pnpm -F @clove/database run db:push-test
+            - name: Run integration tests
+              run: pnpm test:integration
