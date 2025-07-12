@@ -1,6 +1,6 @@
-export default function Home() {
+export default function () {
     return (
-        <div className="h-screen flex items-center justify-center">
+        <div className="flex h-screen items-center justify-center">
             Clove - Manage Authentication and Users with Ease
         </div>
     );
