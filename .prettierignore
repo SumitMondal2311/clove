@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+out
+Dockerfile
+docker-compose.yml
+coverage
+generated
+.DS_Store
+pnpm-lock.yaml
+*.tsbuildinfo

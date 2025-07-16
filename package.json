@@ -1,0 +1,22 @@
+{
+    "name": "clove-turborepo",
+    "private": true,
+    "scripts": {
+        "format": "prettier --write \"**/*.{js,mjs,ts,jsx,tsx,json}\"",
+        "prepare": "husky"
+    },
+    "lint-staged": {
+        "**/*.{js,mjs,ts,jsx,tsx,json}": "prettier --write"
+    },
+    "devDependencies": {
+        "husky": "^9.1.7",
+        "lint-staged": "^16.1.2",
+        "prettier": "^3.6.2",
+        "prettier-plugin-packagejson": "^2.5.18",
+        "turbo": "^2.5.4"
+    },
+    "packageManager": "pnpm@9.0.0",
+    "engines": {
+        "node": ">=18"
+    }
+}
