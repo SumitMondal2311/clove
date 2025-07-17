@@ -1,16 +1,33 @@
-import eslintJs from "@eslint/js";
-import prettier from "eslint-config-prettier";
+import js from "@eslint/js";
+import configPrettier from "eslint-config-prettier";
+import pluginTurbo from "eslint-plugin-turbo";
 import tseslint from "typescript-eslint";
 
 /** @type {import('eslint').Linter.Config[]} */
 
 export const config = [
-    eslintJs.configs.recommended,
+    js.configs.recommended,
     ...tseslint.configs.recommended,
-    prettier,
+    configPrettier,
     {
         rules: {
             "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    argsIgnorePattern: "^_",
+                    varsIgnorePattern: "^_",
+                    caughtErrorsIgnorePattern: "error",
+                },
+            ],
+        },
+    },
+    {
+        plugins: {
+            turbo: pluginTurbo,
+        },
+        rules: {
+            "turbo/no-undeclared-env-vars": "warn",
         },
     },
 ];

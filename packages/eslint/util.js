@@ -13,6 +13,6 @@ export const config = [
         },
     },
     {
-        ignores: [".turbo", "node_modules", "dist"],
+        ignores: [".turbo", "node_modules", "dist", "generated"],
     },
 ];

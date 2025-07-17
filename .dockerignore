@@ -1,0 +1,40 @@
+# dependencies
+node_modules
+
+# build outputs
+dist
+build
+out
+
+# turbo
+.turbo
+
+# next
+next-env.d.ts
+.next
+
+# vercel
+.vercel
+
+# debug & logs
+*-debug*
+*.debug
+logs
+*.log
+
+# testing
+coverage
+
+# prisma
+generated
+
+# editor/OS
+.DS_Store
+
+# env and secrets
+.env
+.env.*
+*.pem
+
+# typescript
+*.tsbuildinfo

@@ -7,6 +7,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { ApiError } from "./configs/api-error.js";
 import { env } from "./configs/env.js";
+import { connectDB, disconnectDB } from "./services/prisma.js";
 
 export const app = express();
 
@@ -43,10 +44,16 @@ app.use((err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
 const server = app.listen(env.PORT, () => {
     console.log(`Ready in ${new Date().getTime() - startTime}ms`);
     console.log(`Server running on ${env.API_ORIGIN}`);
+    connectDB();
 });
 
+let shuttingDown = false;
+
 ["SIGTERM", "SIGINT"].forEach((signal) => {
-    process.on(signal, () => {
+    process.on(signal, async () => {
+        if (shuttingDown) return;
+        shuttingDown = true;
+        await disconnectDB();
         server.close(() => {
             console.log("Server gracefully shut down");
             process.exit(0);

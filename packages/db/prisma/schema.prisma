@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  createdAt    DateTime @default(now())
+  email        String   @unique
+  passwordHash String
+  verified     Boolean  @default(false)
+  mfaEnabled   Boolean  @default(false)
+
+  sessions   Session[]
+  mfaFactors MfaFactor[]
+  auditLogs  AuditLog[]
+
+  @@map("users")
+}
+
+enum RevocationReson {
+  EXPIRATION
+  LOGOUT
+  PASSWORD_CHANGE
+  MANUAL_DELETION
+  SUSPICIOUS_ACTIVITY
+}
+
+model Session {
+  id               String           @id @default(uuid()) @db.Uuid
+  createdAt        DateTime         @default(now())
+  userId           String           @db.Uuid
+  userAgent        String?
+  ipAddress        String?
+  refreshTokenHash String
+  revokedAt        DateTime?
+  deviceId         String?
+  deviceName       String?
+  revoked          Boolean          @default(false)
+  revocationReson  RevocationReson?
+  expiresAt        DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+enum MfaType {
+  EMAIL
+  SMS
+  TOTP
+  WEBAUTHN
+}
+
+model MfaFactor {
+  id         String   @id @default(uuid()) @db.Uuid
+  createdAt  DateTime @default(now())
+  userId     String   @db.Uuid
+  secret     String?
+  type       MfaType
+  deviceName String?
+  verified   Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("mfa_factors")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  userId    String   @db.Uuid
+  event     String
+  ipAddress String?
+  userAgent String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("audit_logs")
+}

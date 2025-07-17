@@ -6,7 +6,24 @@
             "dependsOn": ["^build"]
         },
         "server#build": {
-            "dependsOn": ["^build"]
+            "dependsOn": ["^build"],
+            "env": ["NODE_ENV", "PORT", "API_ORIGIN", "WEB_ORIGIN"],
+            "outputs": ["dist/**"]
+        },
+        "@clove/db#build": {
+            "dependsOn": ["^build"],
+            "env": ["NODE_ENV", "DATABASE_URL"],
+            "outputs": ["dist/**"]
+        },
+        "db:deploy": {
+            "cache": false
+        },
+        "db:generate": {
+            "cache": false
+        },
+        "db:migrate": {
+            "cache": false,
+            "persistent": true
         },
         "check-types": {
             "dependsOn": ["^check-types"]

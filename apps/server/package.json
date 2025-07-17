@@ -18,6 +18,7 @@
         "morgan": "^1.10.0"
     },
     "devDependencies": {
+        "@clove/db": "workspace:^",
         "@clove/eslint": "workspace:^",
         "@clove/tsconfig": "workspace:^",
         "@types/cookie-parser": "^1.4.9",

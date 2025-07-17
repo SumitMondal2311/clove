@@ -12,7 +12,7 @@ if (!parsedSchema.success) {
     parsedSchema.error.issues.forEach((issue) => {
         console.error(`${issue.path}: ${issue.message}`);
     });
-    throw parsedSchema.error;
+    process.exit(1);
 }
 
 export const env = parsedSchema.data;
