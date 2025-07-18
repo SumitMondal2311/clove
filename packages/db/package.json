@@ -16,9 +16,9 @@
         "clean": "rm -rf .turbo dist",
         "db:deploy": "dotenv -e .env.production prisma migrate deploy",
         "db:generate": "prisma generate",
-        "db:migrate": "prisma migrate dev --skip-generate",
-        "db:push": "prisma db push --skip-generate",
-        "db:studio": "prisma studio",
+        "db:migrate": "dotenv -e .env.development prisma migrate dev --skip-generate",
+        "db:push": "dotenv -e .env.development prisma db push",
+        "db:studio": "dotenv -e .env.development prisma studio",
         "lint": "eslint ."
     },
     "dependencies": {

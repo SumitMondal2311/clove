@@ -27,6 +27,7 @@ coverage
 
 # prisma
 generated
+migrations
 
 # misc
 .DS_Store

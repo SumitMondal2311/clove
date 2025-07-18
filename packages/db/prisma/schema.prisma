@@ -6,7 +6,6 @@ generator client {
 datasource db {
   provider = "postgres"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -24,7 +23,8 @@ model User {
   @@map("users")
 }
 
-enum RevocationReson {
+enum RevocationReason {
+  FORCED_BY_SERVER
   EXPIRATION
   LOGOUT
   PASSWORD_CHANGE
@@ -33,17 +33,18 @@ enum RevocationReson {
 }
 
 model Session {
-  id               String           @id @default(uuid()) @db.Uuid
-  createdAt        DateTime         @default(now())
-  userId           String           @db.Uuid
+  id               String            @id @default(uuid()) @db.Uuid
+  createdAt        DateTime          @default(now())
+  userId           String            @db.Uuid
   userAgent        String?
   ipAddress        String?
   refreshTokenHash String
   revokedAt        DateTime?
   deviceId         String?
   deviceName       String?
-  revoked          Boolean          @default(false)
-  revocationReson  RevocationReson?
+  lastUsedAt       DateTime          @default(now())
+  revoked          Boolean           @default(false)
+  revocationReason RevocationReason?
   expiresAt        DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

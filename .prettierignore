@@ -5,6 +5,7 @@ out
 Dockerfile
 docker-compose.yml
 coverage
+migrations
 generated
 .DS_Store
 pnpm-lock.yaml

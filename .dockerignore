@@ -27,6 +27,7 @@ coverage
 
 # prisma
 generated
+migrations
 
 # editor/OS
 .DS_Store

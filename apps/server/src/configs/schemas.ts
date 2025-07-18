@@ -6,3 +6,8 @@ export const envSchema = z.object({
     API_ORIGIN: z.string().optional(),
     WEB_ORIGIN: z.string(),
 });
+
+export const authSchema = z.object({
+    email: z.email("Invalid email"),
+    password: z.string().nonempty("Password is required"),
+});

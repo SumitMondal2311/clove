@@ -7,7 +7,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { ApiError } from "./configs/api-error.js";
 import { env } from "./configs/env.js";
-import { connectDB, disconnectDB } from "./services/prisma.js";
+import { authRouter } from "./routes/auth.routes.js";
+import { connectDB, disconnectDB } from "./lib/prisma.js";
 
 export const app = express();
 
@@ -31,6 +32,8 @@ app.get("/health", (_req: Request, res: Response) => {
         message: "OK",
     });
 });
+
+app.use("/api/auth", authRouter);
 
 app.use((err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
     if (env.NODE_ENV === "production") {
