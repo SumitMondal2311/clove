@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { existsSync, readFileSync } from "fs";
 import jwt from "jsonwebtoken";
 import path from "path";
@@ -26,8 +27,13 @@ for (const file of ["secret.pem", "public.pem"]) {
     }
 }
 
+const createJwtId = () => {
+    return `${Date.now()}-${randomUUID()}`;
+};
+
 const AUTH_SECRET_KEY = readFileSync(`${keysPath}/secret.pem`, "utf-8");
 export const getRefreshToken = (sub: string | number, sid: Base64URLString) => {
+    const jti = createJwtId();
     return jwt.sign(
         {
             sub,
@@ -36,6 +42,7 @@ export const getRefreshToken = (sub: string | number, sid: Base64URLString) => {
         },
         AUTH_SECRET_KEY,
         {
+            jwtid: jti,
             expiresIn: REFRESH_TOKEN_EXPIRES_IN,
             algorithm: "RS256",
         }
@@ -43,6 +50,7 @@ export const getRefreshToken = (sub: string | number, sid: Base64URLString) => {
 };
 
 export const getAccessToken = (sub: string | number) => {
+    const jti = createJwtId();
     return jwt.sign(
         {
             sub,
@@ -50,6 +58,7 @@ export const getAccessToken = (sub: string | number) => {
         },
         AUTH_SECRET_KEY,
         {
+            jwtid: jti,
             expiresIn: ACCESS_TOKEN_EXPIRES_IN,
             algorithm: "RS256",
         }
@@ -61,5 +70,6 @@ export const verifyToken = (token: string) => {
         sub: string;
         sid: string;
         type: "access" | "refresh";
+        jti: string;
     };
 };

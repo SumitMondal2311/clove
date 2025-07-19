@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../configs/api-error";
+import { prisma } from "../lib/prisma.js";
 import { verifyToken } from "../utils/token";
 
 export const authMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
@@ -27,6 +28,11 @@ export const authMiddleware = async (req: Request, _res: Response, next: NextFun
     if (type !== "access") {
         return next(new ApiError(403, "Invalid token type"));
     }
+
+    await prisma.session.update({
+        where: { id: sid },
+        data: { lastUsedAt: new Date() },
+    });
 
     (req as any).data = { userId: sub, sessionId: sid };
 

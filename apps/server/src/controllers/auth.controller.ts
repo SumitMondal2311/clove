@@ -10,6 +10,7 @@ import {
 } from "../configs/constant.js";
 import { authSchema } from "../configs/schemas.js";
 import { prisma } from "../lib/prisma.js";
+import { redis } from "../lib/redis.js";
 import { getAccessToken, getRefreshToken, verifyToken } from "../utils/token.js";
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -18,7 +19,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
         return next(new ApiError(400, parsedSchema.error.issues.map((i) => i.message).join(", ")));
     }
 
-    const { email, password } = parsedSchema.data;
+    const { deviceId, deviceName, email, password } = parsedSchema.data;
     const userExists = await prisma.user.findUnique({
         where: {
             email,
@@ -42,6 +43,8 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
     const [session, _] = await prisma.$transaction([
         prisma.session.create({
             data: {
+                deviceName,
+                deviceId,
                 refreshTokenHash: await hash("temp-token", 10),
                 userAgent: req.headers["user-agent"],
                 expiresAt: CURR_TIME_EXTENDS_REFRESH_TOKEN_EXPIRES_IN,
@@ -99,7 +102,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         return next(new ApiError(400, parsedSchema.error.issues.map((i) => i.message).join(", ")));
     }
 
-    const { email, password } = parsedSchema.data;
+    const { deviceId, deviceName, email, password } = parsedSchema.data;
     const user = await prisma.user.findUnique({
         where: {
             email,
@@ -131,7 +134,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                 revokedAt: new Date(),
                 revoked: true,
                 revocationReason:
-                    sessions[0].expiresAt <= new Date() ? "EXPIRATION" : "FORCED_BY_SERVER",
+                    sessions[0].expiresAt.getTime() <= Date.now()
+                        ? "EXPIRATION"
+                        : "FORCED_BY_SERVER",
             },
             where: {
                 id: sessions[0].id,
@@ -142,6 +147,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const [session, _] = await prisma.$transaction([
         prisma.session.create({
             data: {
+                deviceName,
+                deviceId,
                 refreshTokenHash: await hash("temp-token", 10),
                 userAgent: req.headers["user-agent"],
                 expiresAt: CURR_TIME_EXTENDS_REFRESH_TOKEN_EXPIRES_IN,
@@ -209,7 +216,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
         return next(new ApiError(500, "Failed to verify token: Something went wrong"));
     }
 
-    const { sub, sid, type } = decoded;
+    const { sub, sid, type, jti, exp } = decoded;
     if (type !== "refresh") {
         return next(new ApiError(403, "Invalid token type"));
     }
@@ -225,8 +232,21 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
         return next(new ApiError(404, "Session not found"));
     }
 
-    /* todo(redis):
-        check for token-reuse */
+    if (await redis.get(`jwt-bl-${jti}`)) {
+        await prisma.session.update({
+            data: {
+                revoked: true,
+                revocationReason: "SUSPICIOUS_ACTIVITY",
+            },
+            where: {
+                id: currSession.id,
+            },
+        });
+        res.cookie("__refresh_token__", "", {
+            maxAge: 0,
+        });
+        return next(new ApiError(403, "Attempt blacklisted token re-use, please login again"));
+    }
 
     const newRefreshToken = getRefreshToken(sub, sid);
     const [session, _] = await prisma.$transaction([
@@ -254,8 +274,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
         }),
     ]);
 
-    /* todo(redis):
-        blacklist old-refresh-token */
+    await redis.set(`jwt-bl-${jti}`, "revoked", "EX", exp ?? REFRESH_TOKEN_EXPIRES_IN);
 
     const responseWithCookie = res.cookie("__refresh_token__", getRefreshToken(sub, session.id), {
         secure: IS_PRODUCTION,

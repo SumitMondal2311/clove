@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import z from "zod";
 import { PrismaClient } from "../generated/prisma/index.js";
 
 config({
@@ -11,10 +12,25 @@ config({
     ),
 });
 
-const DATABASE_URL = process.env.DATABASE_URL;
-if (!DATABASE_URL) {
-    throw new Error("Invalid or missing DATABASE_URL");
+export const parsedSchema = z
+    .object({
+        DATABASE_URL: z
+            .string()
+            .regex(
+                /^(postgresql|postgres):\/\/(?:([^:@]+)(?::([^@]+))?@)?([^:/]+)(?::(\d+))?(?:\/([^?]+))?(?:\?(.*))?$/,
+                "Invalid DATABASE_URL format"
+            ),
+    })
+    .safeParse(process.env);
+
+if (!parsedSchema.success) {
+    for (const issue of parsedSchema.error.issues) {
+        console.error(`${issue.path}: ${issue.message}`);
+    }
+    process.exit(1);
 }
+
+const DATABASE_URL = parsedSchema.data.DATABASE_URL;
 
 declare global {
     var prismaSingleton: PrismaClient | undefined;

@@ -7,8 +7,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { ApiError } from "./configs/api-error.js";
 import { env } from "./configs/env.js";
-import { authRouter } from "./routes/auth.routes.js";
 import { connectDB, disconnectDB } from "./lib/prisma.js";
+import { authRouter } from "./routes/auth.routes.js";
 
 export const app = express();
 
@@ -44,10 +44,10 @@ app.use((err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
     });
 });
 
-const server = app.listen(env.PORT, () => {
+const server = app.listen(env.PORT, async () => {
     console.log(`Ready in ${new Date().getTime() - startTime}ms`);
     console.log(`Server running on ${env.API_ORIGIN}`);
-    connectDB();
+    await connectDB();
 });
 
 let shuttingDown = false;
