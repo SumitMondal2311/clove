@@ -3,9 +3,10 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "cross-env NODE_ENV=production tsup",
+        "build": "cross-env NODE_ENV=production tsup && pnpm copy-assets",
         "check-types": "tsc --noEmit",
         "clean": "rm -rf .turbo dist",
+        "copy-assets": "node ./src/scripts/copy-assets.ts",
         "dev": "cross-env NODE_ENV=development tsx watch ./src/index.ts",
         "lint": "eslint .",
         "start": "cross-env NODE_ENV=production node ./dist/index.js"

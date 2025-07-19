@@ -39,13 +39,14 @@ model Session {
   userAgent        String?
   ipAddress        String?
   refreshTokenHash String
-  revokedAt        DateTime?
   deviceId         String?
   deviceName       String?
-  lastUsedAt       DateTime          @default(now())
-  revoked          Boolean           @default(false)
-  revocationReason RevocationReason?
   expiresAt        DateTime
+  lastUsedAt       DateTime          @default(now())
+  lastRotatedAt    DateTime?
+  revoked          Boolean           @default(false)
+  revokedAt        DateTime?
+  revocationReason RevocationReason?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

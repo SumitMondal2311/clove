@@ -1,10 +1,16 @@
 import { compare, hash } from "bcryptjs";
 import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { ApiError } from "../configs/api-error.js";
-import { IS_PRODUCTION, REFRESH_TOKEN_EXPIRES_IN, SESSIONS_LIMIT } from "../configs/constant.js";
+import {
+    CURR_TIME_EXTENDS_REFRESH_TOKEN_EXPIRES_IN,
+    IS_PRODUCTION,
+    REFRESH_TOKEN_EXPIRES_IN,
+    SESSIONS_LIMIT,
+} from "../configs/constant.js";
 import { authSchema } from "../configs/schemas.js";
 import { prisma } from "../lib/prisma.js";
-import { getAccessToken, getRefreshToken } from "../utils/token.js";
+import { getAccessToken, getRefreshToken, verifyToken } from "../utils/token.js";
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
     const parsedSchema = authSchema.safeParse(req.body);
@@ -38,7 +44,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
             data: {
                 refreshTokenHash: await hash("temp-token", 10),
                 userAgent: req.headers["user-agent"],
-                expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRES_IN * 1000),
+                expiresAt: CURR_TIME_EXTENDS_REFRESH_TOKEN_EXPIRES_IN,
                 ipAddress: req.ip === "::1" ? "127.0.0.1" : req.ip,
                 user: {
                     connect: {
@@ -138,7 +144,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             data: {
                 refreshTokenHash: await hash("temp-token", 10),
                 userAgent: req.headers["user-agent"],
-                expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRES_IN * 1000),
+                expiresAt: CURR_TIME_EXTENDS_REFRESH_TOKEN_EXPIRES_IN,
                 ipAddress: req.ip === "::1" ? "127.0.0.1" : req.ip,
                 user: {
                     connect: {
@@ -184,5 +190,82 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         user: safeUser,
         accessToken: getAccessToken(safeUser.id),
         message: "Logged in successfully",
+    });
+};
+
+export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies["__refresh_token__"];
+    if (!refreshToken) {
+        return next(new ApiError(401, "Missing refresh token"));
+    }
+
+    let decoded;
+    try {
+        decoded = verifyToken(refreshToken);
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError || error instanceof jwt.TokenExpiredError) {
+            return next(new ApiError(401, "Invalid or expired token"));
+        }
+        return next(new ApiError(500, "Failed to verify token: Something went wrong"));
+    }
+
+    const { sub, sid, type } = decoded;
+    if (type !== "refresh") {
+        return next(new ApiError(403, "Invalid token type"));
+    }
+
+    const currSession = await prisma.session.findFirst({
+        where: {
+            userId: sub,
+            id: sid,
+        },
+    });
+
+    if (!currSession) {
+        return next(new ApiError(404, "Session not found"));
+    }
+
+    /* todo(redis):
+        check for token-reuse */
+
+    const newRefreshToken = getRefreshToken(sub, sid);
+    const [session, _] = await prisma.$transaction([
+        prisma.session.update({
+            data: {
+                refreshTokenHash: await hash(newRefreshToken, 10),
+                expiresAt: CURR_TIME_EXTENDS_REFRESH_TOKEN_EXPIRES_IN,
+                lastRotatedAt: new Date(),
+            },
+            where: {
+                id: currSession.id,
+            },
+        }),
+        prisma.auditLog.create({
+            data: {
+                event: "Token rotation",
+                ipAddress: req.ip === "::1" ? "127.0.0.1" : req.ip,
+                userAgent: req.headers["user-agent"],
+                user: {
+                    connect: {
+                        id: sub,
+                    },
+                },
+            },
+        }),
+    ]);
+
+    /* todo(redis):
+        blacklist old-refresh-token */
+
+    const responseWithCookie = res.cookie("__refresh_token__", getRefreshToken(sub, session.id), {
+        secure: IS_PRODUCTION,
+        httpOnly: true,
+        maxAge: REFRESH_TOKEN_EXPIRES_IN * 1000,
+        sameSite: "lax",
+    });
+
+    responseWithCookie.status(200).json({
+        accessToken: getAccessToken(sub),
+        message: "Both refresh & access tokens refreshed successfully",
     });
 };
