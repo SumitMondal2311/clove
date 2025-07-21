@@ -14,8 +14,6 @@ export const envSchema = z.object({
 });
 
 export const authSchema = z.object({
-    deviceId: z.string().optional(),
-    deviceName: z.string().optional(),
     email: z.email("Invalid email"),
     password: z.string().nonempty("Password is required"),
 });

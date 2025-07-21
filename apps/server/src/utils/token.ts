@@ -32,7 +32,7 @@ const createJwtId = () => {
 };
 
 const AUTH_SECRET_KEY = readFileSync(`${keysPath}/secret.pem`, "utf-8");
-export const getRefreshToken = (sub: string | number, sid: Base64URLString) => {
+export const getRefreshToken = (sub: string | number, sid: string) => {
     const jti = createJwtId();
     return jwt.sign(
         {
@@ -49,11 +49,12 @@ export const getRefreshToken = (sub: string | number, sid: Base64URLString) => {
     );
 };
 
-export const getAccessToken = (sub: string | number) => {
+export const getAccessToken = (sub: string | number, sid: string) => {
     const jti = createJwtId();
     return jwt.sign(
         {
             sub,
+            sid,
             type: "access",
         },
         AUTH_SECRET_KEY,
@@ -66,7 +67,9 @@ export const getAccessToken = (sub: string | number) => {
 };
 
 export const verifyToken = (token: string) => {
-    return jwt.verify(token, readFileSync(`${keysPath}/public.pem`, "utf-8")) as jwt.JwtPayload & {
+    return jwt.verify(token, readFileSync(`${keysPath}/public.pem`, "utf-8"), {
+        algorithms: ["RS256"],
+    }) as jwt.JwtPayload & {
         sub: string;
         sid: string;
         type: "access" | "refresh";

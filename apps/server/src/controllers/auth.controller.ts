@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../configs/api-error.js";
 import {
+    ACCESS_TOKEN_EXPIRES_IN,
     CURR_TIME_EXTENDS_REFRESH_TOKEN_EXPIRES_IN,
     IS_PRODUCTION,
     REFRESH_TOKEN_EXPIRES_IN,
@@ -11,6 +12,8 @@ import {
 import { authSchema } from "../configs/schemas.js";
 import { prisma } from "../lib/prisma.js";
 import { redis } from "../lib/redis.js";
+import { AuthRequest } from "../types/auth-request.js";
+import { getIP } from "../utils/get-ip.js";
 import { getAccessToken, getRefreshToken, verifyToken } from "../utils/token.js";
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +22,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
         return next(new ApiError(400, parsedSchema.error.issues.map((i) => i.message).join(", ")));
     }
 
-    const { deviceId, deviceName, email, password } = parsedSchema.data;
+    const { email, password } = parsedSchema.data;
     const userExists = await prisma.user.findUnique({
         where: {
             email,
@@ -40,15 +43,15 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
         },
     });
 
-    const [session, _] = await prisma.$transaction([
+    const [session, _auditLog] = await prisma.$transaction([
         prisma.session.create({
             data: {
-                deviceName,
-                deviceId,
+                deviceName: String(req.headers["device-name"]),
+                deviceId: String(req.headers["device-id"]),
                 refreshTokenHash: await hash("temp-token", 10),
                 userAgent: req.headers["user-agent"],
                 expiresAt: CURR_TIME_EXTENDS_REFRESH_TOKEN_EXPIRES_IN,
-                ipAddress: req.ip === "::1" ? "127.0.0.1" : req.ip,
+                ipAddress: getIP(req),
                 user: {
                     connect: {
                         id: newUser.id,
@@ -59,7 +62,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
         prisma.auditLog.create({
             data: {
                 event: "Account created",
-                ipAddress: req.ip === "::1" ? "127.0.0.1" : req.ip,
+                ipAddress: getIP(req),
                 userAgent: req.headers["user-agent"],
                 user: {
                     connect: {
@@ -91,7 +94,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
     responseWithCookie.status(201).json({
         user: safeUser,
-        accessToken: getAccessToken(safeUser.id),
+        accessToken: getAccessToken(safeUser.id, session.id),
         message: "Signed up successfully",
     });
 };
@@ -102,7 +105,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         return next(new ApiError(400, parsedSchema.error.issues.map((i) => i.message).join(", ")));
     }
 
-    const { deviceId, deviceName, email, password } = parsedSchema.data;
+    const { email, password } = parsedSchema.data;
     const user = await prisma.user.findUnique({
         where: {
             email,
@@ -144,15 +147,15 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         });
     }
 
-    const [session, _] = await prisma.$transaction([
+    const [session, _auditLog] = await prisma.$transaction([
         prisma.session.create({
             data: {
-                deviceName,
-                deviceId,
+                deviceName: String(req.headers["device-name"]),
+                deviceId: String(req.headers["device-id"]),
                 refreshTokenHash: await hash("temp-token", 10),
                 userAgent: req.headers["user-agent"],
                 expiresAt: CURR_TIME_EXTENDS_REFRESH_TOKEN_EXPIRES_IN,
-                ipAddress: req.ip === "::1" ? "127.0.0.1" : req.ip,
+                ipAddress: getIP(req),
                 user: {
                     connect: {
                         id: user.id,
@@ -163,7 +166,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         prisma.auditLog.create({
             data: {
                 event: "Logged into account",
-                ipAddress: req.ip === "::1" ? "127.0.0.1" : req.ip,
+                ipAddress: getIP(req),
                 userAgent: req.headers["user-agent"],
                 user: {
                     connect: {
@@ -195,7 +198,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     responseWithCookie.status(200).json({
         user: safeUser,
-        accessToken: getAccessToken(safeUser.id),
+        accessToken: getAccessToken(safeUser.id, session.id),
         message: "Logged in successfully",
     });
 };
@@ -226,15 +229,23 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
             userId: sub,
             id: sid,
         },
+        select: {
+            id: true,
+            refreshTokenHash: true,
+        },
     });
 
     if (!currSession) {
         return next(new ApiError(404, "Session not found"));
     }
 
-    if (await redis.get(`jwt-bl-${jti}`)) {
+    if (
+        (await redis.get(`jwt-bl-${jti}`)) ||
+        !(await compare(refreshToken, currSession.refreshTokenHash))
+    ) {
         await prisma.session.update({
             data: {
+                revokedAt: new Date(),
                 revoked: true,
                 revocationReason: "SUSPICIOUS_ACTIVITY",
             },
@@ -245,11 +256,16 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
         res.cookie("__refresh_token__", "", {
             maxAge: 0,
         });
-        return next(new ApiError(403, "Attempt blacklisted token re-use, please login again"));
+        return next(
+            new ApiError(
+                403,
+                "Warning: Attempt blacklisted token re-use, please login again for security reasons"
+            )
+        );
     }
 
     const newRefreshToken = getRefreshToken(sub, sid);
-    const [session, _] = await prisma.$transaction([
+    const [session, _auditLog] = await prisma.$transaction([
         prisma.session.update({
             data: {
                 refreshTokenHash: await hash(newRefreshToken, 10),
@@ -262,8 +278,8 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
         }),
         prisma.auditLog.create({
             data: {
-                event: "Token rotation",
-                ipAddress: req.ip === "::1" ? "127.0.0.1" : req.ip,
+                event: "Rotated refresh token",
+                ipAddress: getIP(req),
                 userAgent: req.headers["user-agent"],
                 user: {
                     connect: {
@@ -276,7 +292,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
 
     await redis.set(`jwt-bl-${jti}`, "revoked", "EX", exp ?? REFRESH_TOKEN_EXPIRES_IN);
 
-    const responseWithCookie = res.cookie("__refresh_token__", getRefreshToken(sub, session.id), {
+    const responseWithCookie = res.cookie("__refresh_token__", newRefreshToken, {
         secure: IS_PRODUCTION,
         httpOnly: true,
         maxAge: REFRESH_TOKEN_EXPIRES_IN * 1000,
@@ -284,7 +300,85 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     });
 
     responseWithCookie.status(200).json({
-        accessToken: getAccessToken(sub),
+        accessToken: getAccessToken(sub, session.id),
         message: "Both refresh & access tokens refreshed successfully",
     });
+};
+
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies["__refresh_token__"];
+    if (!refreshToken) {
+        return next(new ApiError(401, "Missing refresh token"));
+    }
+
+    const { data } = req as AuthRequest;
+
+    let decoded;
+    try {
+        decoded = verifyToken(refreshToken);
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError || error instanceof jwt.TokenExpiredError) {
+            return next(new ApiError(401, "Invalid or expired token"));
+        }
+        return next(new ApiError(500, "Failed to verify token: Something went wrong"));
+    }
+
+    const { type, jti, exp } = decoded;
+    if (type !== "refresh") {
+        return next(new ApiError(403, "Invalid token type"));
+    }
+
+    if (req.body.fromAll) {
+        await prisma.session.updateMany({
+            data: {
+                revokedAt: new Date(),
+                revoked: true,
+                revocationReason: "LOGOUT",
+            },
+            where: {
+                userId: data?.userId,
+            },
+        });
+    } else {
+        await prisma.session.update({
+            data: {
+                revokedAt: new Date(),
+                revoked: true,
+                revocationReason: "LOGOUT",
+            },
+            where: {
+                userId: data?.userId,
+                id: data?.sessionId,
+            },
+        });
+    }
+
+    await prisma.auditLog.create({
+        data: {
+            event: "Logged out from account",
+            ipAddress: getIP(req),
+            userAgent: req.headers["user-agent"],
+            user: {
+                connect: {
+                    id: data?.userId,
+                },
+            },
+        },
+    });
+
+    await Promise.all([
+        redis.set(
+            `jwt-bl-${data?.access?.jti}`,
+            "revoked",
+            "EX",
+            data?.access?.exp ?? ACCESS_TOKEN_EXPIRES_IN
+        ),
+        redis.set(`jwt-bl-${jti}`, "revoked", "EX", exp ?? REFRESH_TOKEN_EXPIRES_IN),
+    ]);
+
+    res.cookie("__refresh_token__", "", {
+        maxAge: 0,
+    });
+
+    res.status(200).json({ message: "Logged out successfully" });
 };

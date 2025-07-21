@@ -5,5 +5,5 @@ export default defineConfig({
     outDir: "dist",
     format: ["esm"],
     clean: true,
-    external: ["dotenv", "@clove/db"],
+    external: ["ioredis", "dotenv", "@clove/db"],
 });
