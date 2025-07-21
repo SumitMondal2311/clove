@@ -4,6 +4,7 @@
     "type": "module",
     "exports": {
         "./node": "./node.json",
-        "./util": "./util.json"
+        "./util": "./util.json",
+        "./next": "./next.json"
     }
 }

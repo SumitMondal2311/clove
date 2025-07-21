@@ -1,9 +1,13 @@
 {
     "$schema": "https://turborepo.com/schema.json",
-
+    "ui": "tui",
     "tasks": {
         "build": {
             "dependsOn": ["^build"]
+        },
+        "dashboard#build": {
+            "dependsOn": ["^build"],
+            "outputs": [".next/**", "!.next/cache/**"]
         },
         "server#build": {
             "dependsOn": ["^build"],
