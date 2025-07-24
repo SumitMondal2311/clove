@@ -3,6 +3,7 @@
     "private": true,
     "type": "module",
     "exports": {
+        "./react": "./react.js",
         "./node": "./node.js",
         "./util": "./util.js",
         "./next": "./next.js"
@@ -12,6 +13,7 @@
         "@next/eslint-plugin-next": "^15.4.2",
         "eslint-config-prettier": "^10.1.5",
         "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-turbo": "^2.5.5",
         "globals": "^16.3.0",
         "typescript-eslint": "^8.35.1"

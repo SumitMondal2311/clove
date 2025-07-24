@@ -1,9 +1,17 @@
-import { Geist_Mono } from "next/font/google";
-import "../styles/index.css";
+import { Toaster } from "@/components/ui/sonner";
+import { JetBrains_Mono, Outfit } from "next/font/google";
+import "../styles/global.css";
 
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
+const outfit = Outfit({
+    variable: "--font-outfit",
     display: "swap",
+    subsets: ["latin"],
+});
+
+const jet_brains_mono = JetBrains_Mono({
+    variable: "--font-jet-brains-mono",
+    display: "swap",
+    weight: "700",
     subsets: ["latin"],
 });
 
@@ -14,7 +22,10 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${geistMono.variable} antialiased`}>{children}</body>
+            <body className={`${outfit.variable} ${jet_brains_mono.variable} antialiased`}>
+                {children}
+                <Toaster />
+            </body>
         </html>
     );
 }

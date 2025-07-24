@@ -328,7 +328,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
         return next(new ApiError(403, "Invalid token type"));
     }
 
-    if (req.body.fromAll) {
+    if (req.body?.fromAll) {
         await prisma.session.updateMany({
             data: {
                 revokedAt: new Date(),
