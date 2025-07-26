@@ -38,6 +38,7 @@ migrations
 .env
 !.env.example
 *.pem
+*.key
 
 # editor/OS
 .vscode

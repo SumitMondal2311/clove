@@ -5,18 +5,19 @@
         "build": {
             "dependsOn": ["^build"]
         },
-        "dashboard#build": {
+        "web#build": {
             "dependsOn": ["^build"],
+            "env": ["NODE_ENV", "NEXT_PUBLIC_API_ORIGIN"],
             "outputs": [".next/**", "!.next/cache/**"]
         },
-        "server#build": {
+        "api#build": {
             "dependsOn": ["^build"],
             "env": ["NODE_ENV", "PORT", "API_ORIGIN", "WEB_ORIGIN"],
             "outputs": ["dist/**"]
         },
-        "@clove/db#build": {
+        "@clove/database#build": {
             "dependsOn": ["^build"],
-            "env": ["NODE_ENV", "DATABASE_URL"],
+            "env": ["DATABASE_URL"],
             "outputs": ["dist/**"]
         },
         "db:deploy": {

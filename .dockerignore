@@ -36,6 +36,7 @@ migrations
 .env
 .env.*
 *.pem
+*.key
 
 # typescript
 *.tsbuildinfo

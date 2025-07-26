@@ -1,44 +1,23 @@
 services:
-    redis_test:
+    redis:
         image: redis:8.0-alpine
         command: ["redis-server", "--requirepass", "redis"]
         ports:
-            - 6302:6379
+            - 6300:6379
         volumes:
-            - redis_data_test:/data
+            - redis_data:/data
 
-    postgres_test:
+    postgres:
         image: postgres:17.5-alpine
         restart: unless-stopped
         ports:
-            - 5402:5432
+            - 5400:5432
         environment:
             POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: test
+            POSTGRES_DB: clove
         volumes:
-            - pgdata_test:/var/lib/postgresql/data
-    
-    redis_dev:
-        image: redis:8.0-alpine
-        command: ['redis-server', "--requirepass", "redis"]
-        ports:
-            - 6301:6379
-        volumes:
-            - redis_data_dev:/data
-
-    postgres_dev:
-        image: postgres:17-alpine
-        restart: unless-stopped
-        ports:
-            - 5401:5432
-        environment:
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: dev
-        volumes:
-            - pgdata_dev:/var/lib/postgresql/data
+            - pgdata:/var/lib/postgresql/data
 
 volumes:
-    redis_data_test:
-    pgdata_test:
-    redis_data_dev:
-    pgdata_dev:
+    redis_data:
+    pgdata:
