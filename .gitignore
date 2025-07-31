@@ -1,0 +1,41 @@
+# dependencies
+node_modules
+
+# build outputs
+dist
+build
+out
+
+# turbo
+.turbo
+
+# next
+next-env.d.ts
+.next
+
+# vercel
+.vercel
+
+# debugs & logs
+*-debug*
+*.debug
+logs
+*.log
+
+# misc
+.DS_Store
+.lock
+
+# env and secrets
+.env.*
+.env
+!.env.example
+*.pem
+*.key
+
+# editor/OS
+.vscode
+.DS_Store
+
+# typescript
+*.tsbuildinfo
