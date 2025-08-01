@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  INACTIVE
+  LOCKED
+  ACTIVE
+  PENDING_VERIFICATION
+  PENDING_DELETION
+  DELETED
+}
+
+model User {
+  id                  String     @id() @default(uuid()) @db.Uuid
+  password            String? // hashed
+  mobile              String?
+  mfaEnabled          Boolean    @default(false)
+  status              UserStatus @default(ACTIVE)
+  lastLoginIp         String?
+  failedLoginAttempts Int        @default(0)
+  warnings            Int        @default(0)
+  lockedUntil         DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts       Account[]
+  emailAddresses EmailAddress[]
+  sessions       Session[]
+  tokens         Token[]
+  mfaFactors     MfaFactor[]
+  auditLogs      AuditLog[]
+}
+
+enum OAuthProvider {
+  DISCORD
+  GOOGLE
+  X
+  FACEBOOK
+  APPLE
+  GITHUB
+}
+
+model Account {
+  id             String        @id @default(uuid()) @db.Uuid
+  provider       OAuthProvider
+  providerUserId String        @unique
+  accToken       String? // hashed
+  refToken       String? // hashed
+  userId         String        @db.Uuid
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+}
+
+model EmailAddress {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  primary   Boolean  @default(true)
+  email     String   @unique @db.VarChar(320)
+  verified  Boolean  @default(false)
+  banned    Boolean  @default(false)
+  banReason String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, email])
+  @@index([userId])
+}
+
+enum LoginMethod {
+  EMAIL
+  OAUTH
+  SMS
+  BACKUP_CODES
+  TOTP
+  WEBAUTHN
+}
+
+model Session {
+  id           String      @id @default(uuid()) @db.Uuid
+  userAgent    String?
+  ipAddress    String?
+  trusted      Boolean     @default(false)
+  location     String?
+  refToken     String      @unique // hashed
+  userId       String      @db.Uuid
+  loginMethod  LoginMethod @default(EMAIL)
+  fingerprint  String?
+  revoked      Boolean     @default(false)
+  lastActiveAt DateTime    @default(now())
+  expiresAt    DateTime
+  lastRotateAt DateTime?
+  revokedAt    DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_CHANGE
+}
+
+model Token {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  token     String    @unique // hashed
+  type      TokenType
+  ipAddress String?
+  userAgent String?
+  used      Boolean   @default(false)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum MfaType {
+  EMAIL
+  SMS
+  BACKUP_CODES
+  TOTP
+  WEBAUTHN
+}
+
+model MfaFactor {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @db.Uuid
+  deviceName     String?
+  ipAddress      String?
+  userAgent      String?
+  type           MfaType
+  backupCodes    String[] // hashed
+  secret         String?
+  verified       Boolean  @default(false)
+  failedAttempts Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum AuditEvent {
+  ACCOUNT_CREATED
+  EMAIL_VERIFIED
+  LOGGED_INTO_ACCOUNT
+  SUSPICIOUS_LOGIN
+  SETUP_MFA
+  MFA_DISABLED
+  PASSWORD_CHANGED
+}
+
+model AuditLog {
+  id        String     @id @default(uuid()) @db.Uuid
+  userId    String     @db.Uuid
+  event     AuditEvent
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

@@ -5,6 +5,8 @@ out
 *.key
 Dockerfile
 docker-compose.yml
+generated
+migrations
 .DS_Store
 pnpm-lock.yaml
 *.tsbuildinfo

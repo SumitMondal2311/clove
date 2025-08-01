@@ -1,0 +1,14 @@
+services:
+    postgres:
+        image: postgres:17.5-alpine
+        restart: unless-stopped
+        ports:
+            - 5400:5432
+        environment:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: clove
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+
+volumes:
+    pgdata:

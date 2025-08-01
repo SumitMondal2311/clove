@@ -16,7 +16,7 @@ next-env.d.ts
 # vercel
 .vercel
 
-# debugs & logs
+# debug & logs
 *-debug*
 *.debug
 logs
@@ -26,20 +26,14 @@ logs
 generated
 migrations
 
-# misc
+# editor/OS
 .DS_Store
-.lock
 
 # env and secrets
-.env.*
 .env
-!.env.example
+.env.*
 *.pem
 *.key
-
-# editor/OS
-.vscode
-.DS_Store
 
 # typescript
 *.tsbuildinfo
