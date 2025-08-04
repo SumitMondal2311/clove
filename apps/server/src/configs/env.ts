@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import path from "path";
-import { envSchema } from "../schemas/env.schema.js";
+import { envSchema } from "./validator.js";
 
 config({
     path: path.resolve(process.cwd(), ".env.local"),
@@ -18,5 +18,5 @@ if (!parsedSchema.success) {
 export const env = parsedSchema.data;
 
 if (env.NODE_ENV !== "production") {
-    env.API_ORIGIN = `http://localhost:${env.PORT}`;
+    env.API_ORIGIN = `http://localhost:${env.PORT}/api`;
 }

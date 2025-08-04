@@ -5,7 +5,7 @@ import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
-import { appRoutes } from "./app-routes.js";
+import { appRouter } from "./app-routes.js";
 import { ApiError } from "./configs/api-error.js";
 import { env } from "./configs/env.js";
 
@@ -26,7 +26,7 @@ app.use(
 app.use(helmet());
 app.use(morgan("dev"));
 
-appRoutes(app);
+app.use("/api", appRouter);
 
 app.use((err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
     if (env.NODE_ENV === "production") {

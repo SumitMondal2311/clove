@@ -1,8 +1,6 @@
 import { prisma } from "@clove/database";
 import { setTimeout } from "timers/promises";
 
-export { prisma };
-
 export const disconnectDB = async () => {
     try {
         await prisma.$disconnect();

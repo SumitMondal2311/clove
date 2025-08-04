@@ -1,10 +1,13 @@
-import { Express, Request, Response } from "express";
+import { Request, Response, Router } from "express";
+import { authRouter } from "./routes/auth-route.js";
 
-export const appRoutes = (app: Express) => {
-    app.get("/health", (_req: Request, res: Response) => {
-        res.status(200).json({
-            uptime: process.uptime(),
-            message: "FINE",
-        });
+export const appRouter = Router();
+
+appRouter.get("/health", (_req: Request, res: Response) => {
+    res.status(200).json({
+        uptime: process.uptime(),
+        message: "FINE",
     });
-};
+});
+
+appRouter.use("/auth", authRouter);
