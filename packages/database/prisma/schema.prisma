@@ -121,7 +121,7 @@ enum TokenType {
 model Token {
   id        String    @id @default(uuid()) @db.Uuid
   userId    String    @db.Uuid
-  token     String    @unique // hashed
+  token     String    @unique
   type      TokenType
   ipAddress String?
   userAgent String?
