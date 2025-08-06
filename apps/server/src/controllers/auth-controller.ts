@@ -5,7 +5,8 @@ import { NextFunction, Request, Response } from "express";
 import { ApiError } from "../configs/api-error.js";
 import { constant } from "../configs/constant.js";
 import { authSchema } from "../configs/validator.js";
-import { signToken } from "../services/jwt-service.js";
+import { redis } from "../lib/redis.js";
+import { signToken, verifyToken } from "../services/jwt-service.js";
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
     const parsedSchema = authSchema.safeParse(req.body);
@@ -132,7 +133,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const { email, password } = parsedSchema.data;
     const emailRecord = await prisma.emailAddress.findFirst({
         where: {
-            banned: false,
             email,
         },
         include: {
@@ -144,12 +144,33 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         return next(new ApiError(401, "Failed to login: Invalid login credentials"));
     }
 
+    const emailBannedUntil = emailRecord.bannedUntil!;
+    if (emailRecord.banned) {
+        if (Date.now() > emailBannedUntil.getTime()) {
+            await prisma.emailAddress.update({
+                data: {
+                    banned: false,
+                },
+                where: {
+                    email,
+                },
+            });
+        } else {
+            return next(
+                new ApiError(
+                    401,
+                    "Failed to login: Your email has been banned for some security reasons, we'll notify you as the ban get uplifted"
+                )
+            );
+        }
+    }
+
     const user = emailRecord.user;
     if (user.status === "LOCKED") {
         return next(
             new ApiError(
                 401,
-                "Failed to login: Your account is locked for security reasons, and will be unlocked soon..."
+                "Failed to login: Your account is locked for some security reasons, we'll notify you as your account gets unlocked"
             )
         );
     }
@@ -164,36 +185,45 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             },
             where: {
                 id: user.id,
-                status: "ACTIVE",
             },
         });
         if (updatedUser.failedLoginAttempts >= constant.FAILED_LOGIN_ATTEMPTS) {
             await prisma.$transaction(async (tx) => {
-                await tx.user.update({
+                const bannedEmail = await tx.emailAddress.update({
                     data: {
-                        status: "LOCKED",
-                        lockedUntil: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                        bannedUntil: new Date(Date.now() + constant.EMAIL_BAN_DURATION_MS),
+                        banned: true,
+                        banReason: "TOO_MANY_FAILED_ATTEMPTS",
                     },
                     where: {
-                        id: user.id,
-                        status: "ACTIVE",
+                        userId_email: {
+                            userId: user.id,
+                            email,
+                        },
                     },
                 });
-                await tx.session.updateMany({
+                await tx.auditLog.create({
                     data: {
-                        revokedAt: new Date(),
-                        revoked: true,
-                    },
-                    where: {
-                        userId: user.id,
-                        revoked: false,
+                        event: "EMAIL_BANNED",
+                        ipAddress: req.ip,
+                        userAgent: req.headers["user-agent"],
+                        metadata: {
+                            banned_email: email,
+                            description: "Too many failed login attempts",
+                            banned_until: bannedEmail.bannedUntil,
+                        },
+                        user: {
+                            connect: {
+                                id: updatedUser.id,
+                            },
+                        },
                     },
                 });
             });
             return next(
                 new ApiError(
                     401,
-                    "Your account gets locked due to multiple failed login attempts, please try after 24 hours"
+                    "Your email has been banned for 24 hours due to multiple failed login attempts, we'll notify you as the ban get uplifted"
                 )
             );
         }
@@ -244,7 +274,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             },
             where: {
                 id: user.id,
-                status: "ACTIVE",
             },
         });
         await tx.emailAddress.updateMany({
@@ -324,5 +353,160 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             constant.ACC_TOKEN_EXPIRES_IN
         ),
         message: "Logged in successfully",
+    });
+};
+
+export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies["__refresh_token__"];
+    if (!refreshToken) {
+        return next(new ApiError(401, "Missing refresh token"));
+    }
+
+    const verificationResult = await verifyToken(refreshToken);
+    if (!verificationResult.verified) {
+        return next(
+            new ApiError(
+                verificationResult.status as number,
+                `Failed to verify token: ${verificationResult.message ?? "something went wrong"}`
+            )
+        );
+    }
+
+    const refreshPayload = verificationResult.payload!;
+    const currSession = verificationResult.session!;
+
+    if (refreshPayload?.type !== "refresh") {
+        return next(new ApiError(403, "Failed to verify token: Invalid token type"));
+    }
+
+    if (
+        (await compare(refreshToken, currSession.refToken)) === false ||
+        (await redis.exists(`jwt-bl:${refreshPayload.jti}`)) === 1
+    ) {
+        const updatedUser = await prisma.user.update({
+            data: {
+                warnings: {
+                    increment: 1,
+                },
+            },
+            where: {
+                id: currSession?.userId,
+                status: "ACTIVE",
+            },
+        });
+        if (updatedUser.warnings >= constant.MAX_WARNINGS) {
+            await prisma.$transaction(async (tx) => {
+                const lockedUser = await tx.user.update({
+                    data: {
+                        status: "LOCKED",
+                        lockedUntil: new Date(Date.now() + constant.ACCOUNT_LOCK_DURATION_MS),
+                    },
+                    where: {
+                        id: updatedUser.id,
+                        status: "ACTIVE",
+                    },
+                });
+                await tx.session.updateMany({
+                    data: {
+                        revokedAt: new Date(),
+                        revoked: true,
+                    },
+                    where: {
+                        userId: updatedUser.id,
+                        revoked: false,
+                    },
+                });
+                await tx.auditLog.create({
+                    data: {
+                        event: "ACCOUNT_LOCKED",
+                        ipAddress: req.ip,
+                        userAgent: req.headers["user-agent"],
+                        metadata: {
+                            description:
+                                "Crossed max warning limits by breaking security protocols multiple times",
+                            locked_until: lockedUser.lockedUntil,
+                        },
+                        user: {
+                            connect: {
+                                id: updatedUser.id,
+                            },
+                        },
+                    },
+                });
+            });
+
+            return next(
+                new ApiError(
+                    401,
+                    "Your account has been locked for 7 days for crossing the warning limit & breaching the security protocols multiple times, we'll notify you as your account gets unlocked"
+                )
+            );
+        } else {
+            await prisma.session.update({
+                data: {
+                    revokedAt: new Date(),
+                    revoked: true,
+                },
+                where: {
+                    id: currSession?.id,
+                    revoked: false,
+                },
+            });
+        }
+        res.cookie("__refresh_token__", "", {
+            maxAge: 0,
+        });
+        return next(
+            new ApiError(
+                401,
+                "Warning: Token tampered or attempt re-use, please log in again for security reasons"
+            )
+        );
+    }
+
+    const newRefreshToken = signToken(
+        {
+            sub: currSession?.userId,
+            session_id: currSession?.id,
+            type: "refresh",
+        },
+        constant.REF_TOKEN_EXPIRES_IN
+    );
+
+    await prisma.session.update({
+        data: {
+            refToken: await hash(newRefreshToken, 10),
+            lastRotateAt: new Date(),
+            expiresAt: new Date(Date.now() + constant.REF_TOKEN_EXPIRES_IN * 1000),
+            lastActiveAt: new Date(),
+        },
+        where: {
+            id: currSession?.id,
+        },
+    });
+
+    await redis.set(
+        `jwt-bl:${refreshPayload.jti}`,
+        "revoked",
+        "EX",
+        refreshPayload.exp || constant.REF_TOKEN_EXPIRES_IN
+    );
+
+    const responseWithCookie = res.cookie("__refresh_token__", newRefreshToken, {
+        secure: constant.IS_PRODUCTION,
+        httpOnly: true,
+        maxAge: constant.REF_TOKEN_EXPIRES_IN * 1000,
+        sameSite: "strict",
+    });
+
+    responseWithCookie.status(200).json({
+        accessToken: signToken(
+            {
+                session_id: currSession?.id,
+                type: "access",
+                sub: currSession?.userId,
+            },
+            constant.ACC_TOKEN_EXPIRES_IN
+        ),
     });
 };

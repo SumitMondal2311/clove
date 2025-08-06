@@ -25,7 +25,7 @@ export const verifyToken = async (token: string) => {
             clockTolerance: 30,
         }) as AuthPayload;
 
-        const session = await prisma.session.findUnique({
+        const session = await prisma.session.findFirst({
             where: {
                 userId: payload.sub,
                 id: payload.session_id,
@@ -34,6 +34,7 @@ export const verifyToken = async (token: string) => {
         });
 
         if (!session) {
+            console.log("Session not found");
             return {
                 verified: false,
                 status: 404,
@@ -44,6 +45,7 @@ export const verifyToken = async (token: string) => {
         return {
             verified: true,
             payload,
+            session,
         };
     } catch (error) {
         if (
@@ -57,5 +59,11 @@ export const verifyToken = async (token: string) => {
                 message: "Invalid, expired or malformed token",
             };
         }
+
+        return {
+            verified: false,
+            status: 500,
+            message: "Something went wrong!",
+        };
     }
 };
