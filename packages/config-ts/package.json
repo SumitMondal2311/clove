@@ -1,0 +1,8 @@
+{
+    "name": "@clove/config-ts",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./node": "./node.json"
+    }
+}

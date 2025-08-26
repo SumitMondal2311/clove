@@ -1,0 +1,35 @@
+{
+    "name": "api",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "cross-env NODE_ENV=production tsc",
+        "check-types": "tsc --noEmit",
+        "clean": "rm -rf .turbo dist",
+        "dev": "cross-env NODE_ENV=development tsx watch ./src/server.ts",
+        "lint": "eslint .",
+        "start": "cross-env NODE_ENV=production node ./dist/server.js"
+    },
+    "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "cross-env": "^10.0.0",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0",
+        "helmet": "^8.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "morgan": "^1.10.0",
+        "zod": "^4.0.17"
+    },
+    "devDependencies": {
+        "@clove/config-eslint": "workspace:^",
+        "@clove/config-ts": "workspace:^",
+        "@types/cookie-parser": "^1.4.9",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.3",
+        "@types/morgan": "^1.9.10",
+        "dotenv-cli": "^10.0.0",
+        "tsx": "^4.20.3"
+    }
+}
