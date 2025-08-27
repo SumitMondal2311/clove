@@ -1,0 +1,15 @@
+services:
+    postgres:
+        container_name: postgres_local
+        image: postgres:17.5-alpine
+        restart: unless-stopped
+        ports:
+            - 5401:5432
+        environment:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: clove_pg_local
+        volumes:
+            - local_pgdata:/var/lib/postgresql/data
+
+volumes:
+    local_pgdata:
