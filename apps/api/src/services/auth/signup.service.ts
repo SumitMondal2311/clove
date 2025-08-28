@@ -134,8 +134,8 @@ export const signupService = async ({
                 },
             });
         })
-        .then(() => {
-            sendVerificationEmail(email, encodeURIComponent(`${tokenId}.${tokenSecret}`));
+        .then(async () => {
+            await sendVerificationEmail(email, encodeURIComponent(`${tokenId}.${tokenSecret}`));
         });
 
     return status;

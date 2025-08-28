@@ -50,23 +50,23 @@ export const verifyEmailController = async (req: Request, res: Response, next: N
         tokenId,
     });
 
-    const responseWithCookie = res.cookie("__refresh_token__", refreshToken, {
-        secure: constant.IS_PRODUCTION,
-        httpOnly: true,
-        maxAge: constant.REFRESH_TOKEN_EXPIRY_MS,
-        sameSite: "strict",
-    });
-
-    responseWithCookie.status(200).json({
-        user,
-        accessToken: await signToken(
-            {
-                type: "access",
-                session_id: sessionId,
-                sub: user.id,
-            },
-            env.ACCESS_TOKEN_EXPIRY
-        ),
-        message: "Email verified successfully.",
-    });
+    res.status(200)
+        .cookie("__refresh_token__", refreshToken, {
+            secure: constant.IS_PRODUCTION,
+            httpOnly: true,
+            maxAge: constant.REFRESH_TOKEN_EXPIRY_MS,
+            sameSite: "strict",
+        })
+        .json({
+            user,
+            accessToken: await signToken(
+                {
+                    type: "access",
+                    session_id: sessionId,
+                    sub: user.id,
+                },
+                env.ACCESS_TOKEN_EXPIRY
+            ),
+            message: "Email verified successfully.",
+        });
 };
