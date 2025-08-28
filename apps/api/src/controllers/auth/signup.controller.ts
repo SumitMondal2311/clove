@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { authSchema } from "../../configs/validator.js";
 import { signupService } from "../../services/auth/signup.service.js";
 import { CloveError } from "../../utils/clove-error.js";
-import { getNormalizedIP } from "../../utils/normalized-ip.js";
+import { getNormalizedIP } from "../../utils/get-normalized-ip.js";
 
 export const signupController = async (req: Request, res: Response, next: NextFunction) => {
     const validationResult = authSchema.safeParse(req.body);
@@ -30,6 +30,6 @@ export const signupController = async (req: Request, res: Response, next: NextFu
     }
 
     res.status(201).json({
-        message: `Signed up successfully. Verification link that sent to your email. Please check your inbox`,
+        message: `Signed up successfully. A verification link sent to your email. Please check your inbox.`,
     });
 };

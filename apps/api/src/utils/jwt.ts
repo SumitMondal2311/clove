@@ -1,4 +1,4 @@
-import { createPrivateKey } from "crypto";
+import { createPrivateKey, createPublicKey } from "crypto";
 import { existsSync, readFileSync } from "fs";
 import { JWTVerifyResult, SignJWT, errors, jwtVerify } from "jose";
 import { resolve } from "path";
@@ -14,13 +14,13 @@ if (existsSync(secretsDir) === false) {
 
 const privatePemPath = resolve(secretsDir, "rsa-private.pem");
 const publicPemPath = resolve(secretsDir, "rsa-public.pem");
-if (!existsSync(privatePemPath) || !existsSync(privatePemPath)) {
+if (!existsSync(privatePemPath) || !existsSync(publicPemPath)) {
     console.error("Missing rsa-private.pem or rsa-public.pem file");
     process.exit(1);
 }
 
 const privateKey = createPrivateKey(readFileSync(privatePemPath, "utf8"));
-const publicKey = createPrivateKey(readFileSync(publicPemPath, "utf8"));
+const publicKey = createPublicKey(readFileSync(publicPemPath, "utf8"));
 
 export const signToken = (
     payload: AuthJWTPayload,

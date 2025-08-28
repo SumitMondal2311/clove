@@ -1,13 +1,14 @@
 import { hash } from "argon2";
-import { randomBytes } from "crypto";
+import { randomBytes, randomUUID } from "crypto";
 import { env } from "../../configs/env.js";
 import { redis } from "../../configs/redis.js";
 import { prisma } from "../../db/index.js";
 import { findEmailByAddress } from "../../db/queries/email.query.js";
+import { sendVerificationEmail } from "../../emails/service.js";
 import { CloveError } from "../../utils/clove-error.js";
 import { getExpiryDate } from "../../utils/get-expiry-date.js";
+import { getHmacSHA256 } from "../../utils/get-hmac-sha256.js";
 import { redisKey } from "../../utils/redis-key.js";
-import { sha256Hash } from "../../utils/sha256-hash.js";
 
 type Status = "EMAIL_UNVERIFIED_RESENT" | "SIGNUP_SUCCESS";
 
@@ -22,10 +23,12 @@ export const signupService = async ({
     email: string;
     password: string;
 }): Promise<Status> => {
-    let status: Status = "SIGNUP_SUCCESS";
-    const rawTokenSecret = randomBytes(32).toString("hex");
+    const tokenSecret = randomBytes(32).toString("hex");
+    const tokenId = randomUUID();
     const emailRecord = await findEmailByAddress(email);
+    let status: Status = "SIGNUP_SUCCESS";
     let userId;
+    let emailId;
 
     await prisma
         .$transaction(async (tx) => {
@@ -36,6 +39,15 @@ export const signupService = async ({
                         details: "Conflict: This email is already registered and verified.",
                     });
                 } else {
+                    const isRateLimited = await redis.get(redisKey.verificationRateLimit(email));
+                    if (isRateLimited) {
+                        throw new CloveError(429, {
+                            message: "Rate limit exceeded",
+                            details:
+                                "Too Many Requests: You can request a new verification email every 60 seconds.",
+                        });
+                    }
+
                     const verificationResends = await redis.incr(
                         redisKey.verificationResends(email)
                     );
@@ -50,18 +62,10 @@ export const signupService = async ({
                         });
                     }
 
-                    const isRateLimited = await redis.get(redisKey.verificationRateLimit(email));
-                    if (isRateLimited) {
-                        throw new CloveError(429, {
-                            message: "Rate limit exceeded",
-                            details:
-                                "Too Many Requests: You can request a new verification email every 60 seconds.",
-                        });
-                    }
-
                     await redis.set(redisKey.verificationRateLimit(email), "cooldown", "EX", 60);
 
                     userId = emailRecord.userId;
+                    emailId = emailRecord.id;
                     status = "EMAIL_UNVERIFIED_RESENT";
                 }
             } else {
@@ -69,7 +73,7 @@ export const signupService = async ({
                     data: {},
                 });
                 userId = user.id;
-                await tx.email.create({
+                const newEmailRecord = await tx.email.create({
                     data: {
                         email,
                         primary: true,
@@ -80,6 +84,7 @@ export const signupService = async ({
                         },
                     },
                 });
+                emailId = newEmailRecord.id;
                 await tx.account.create({
                     data: {
                         password: await hash(password),
@@ -112,7 +117,8 @@ export const signupService = async ({
             });
             return await tx.token.create({
                 data: {
-                    secret: sha256Hash(rawTokenSecret),
+                    secret: getHmacSHA256(tokenSecret),
+                    id: tokenId,
                     type: "EMAIL_VERIFICATION",
                     expiresAt: getExpiryDate(env.EMAIL_VERIFICATION_TOKEN_EXPIRY_MS),
                     user: {
@@ -120,11 +126,16 @@ export const signupService = async ({
                             id: userId,
                         },
                     },
+                    email: {
+                        connect: {
+                            id: emailId,
+                        },
+                    },
                 },
             });
         })
         .then(() => {
-            // send verification email
+            sendVerificationEmail(email, encodeURIComponent(`${tokenId}.${tokenSecret}`));
         });
 
     return status;

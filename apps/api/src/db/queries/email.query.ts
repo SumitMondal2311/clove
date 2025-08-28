@@ -1,9 +1,20 @@
-import { Email, prisma } from "../index.js";
+import { prisma } from "../index.js";
 
 export const findEmailByAddress = (email: string) => {
     return prisma.email.findUnique({
         where: {
             email,
+        },
+    });
+};
+
+export const findEmailInclueUser = (id: string) => {
+    return prisma.email.findUnique({
+        where: {
+            id,
+        },
+        include: {
+            user: true,
         },
     });
 };

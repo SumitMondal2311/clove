@@ -6,11 +6,15 @@ export const envSchema = z.object({
     WEB_ORIGIN: z.string(),
     API_ORIGIN: z.string(),
     DATABASE_MAX_RETRIES: z.string().transform(Number),
+    HMAC_SHA256_SECRET_KEY: z.base64(),
     DATABASE_URL: z.string(),
     JWT_KID: z.string(),
     JWT_ISS: z.string(),
+    RESEND_API_KEY: z.string(),
     REDIS_URL: z.string(),
+    ACCESS_TOKEN_EXPIRY: z.string().transform((str): number => eval(str)),
     EMAIL_VERIFICATION_TOKEN_EXPIRY_MS: z.string().transform((str): number => eval(str)),
+    REFRESH_TOKEN_EXPIRY: z.string().transform((str): number => eval(str)),
 });
 
 export const authSchema = z.object({

@@ -92,6 +92,8 @@ model Email {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tokens Token[]
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -117,12 +119,14 @@ model Session {
 model Token {
   id        String    @id @default(uuid()) @db.Uuid
   userId    String    @db.Uuid
+  emailId   String    @db.Uuid
   type      TokenType
   secret    String
   expiresAt DateTime
   createdAt DateTime  @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email Email? @relation(fields: [emailId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
