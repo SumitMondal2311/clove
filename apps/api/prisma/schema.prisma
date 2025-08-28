@@ -16,7 +16,7 @@ enum UserStatus {
   DELETION_PENDING
 }
 
-enum OAuthProvider {
+enum AccountProvider {
   GOOGLE
   LOCAL
   GITHUB
@@ -69,13 +69,13 @@ model User {
 }
 
 model Account {
-  id             String        @id @default(uuid()) @db.Uuid
-  providerUserId String        @unique // email for LOCAL
-  provider       OAuthProvider @default(LOCAL)
-  userId         String        @db.Uuid
+  id             String          @id @default(uuid()) @db.Uuid
+  providerUserId String          @unique // email for LOCAL
+  provider       AccountProvider @default(LOCAL)
+  userId         String          @db.Uuid
   password       String? // hashed
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

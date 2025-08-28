@@ -1,4 +1,12 @@
 services:
+    redis:
+        container_name: redis_local
+        image: redis:8.0-alpine
+        command: ["redis-server", "--requirepass", "redis"]
+        ports:
+            - 6301:6379
+        volumes:
+            - local_redis_data:/data
     postgres:
         container_name: postgres_local
         image: postgres:17.5-alpine
@@ -12,4 +20,5 @@ services:
             - local_pgdata:/var/lib/postgresql/data
 
 volumes:
+    local_redis_data:
     local_pgdata:
