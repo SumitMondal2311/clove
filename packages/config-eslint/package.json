@@ -3,11 +3,15 @@
     "private": true,
     "type": "module",
     "exports": {
-        "./node": "./node.js"
+        "./node": "./node.js",
+        "./next": "./next.js"
     },
     "devDependencies": {
         "@eslint/js": "^9.31.0",
+        "@next/eslint-plugin-next": "^15.5.0",
         "eslint-config-prettier": "^10.1.5",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-turbo": "^2.5.5",
         "globals": "^16.3.0",
         "typescript-eslint": "^8.35.1"

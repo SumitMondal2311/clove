@@ -1,0 +1,32 @@
+{
+    "name": "web",
+    "private": true,
+    "scripts": {
+        "build": "next build --turbopack",
+        "check-types": "tsc --noEmit",
+        "clean": "rm -rf .turbo .next",
+        "dev": "next dev --turbopack",
+        "lint": "eslint",
+        "start": "next start"
+    },
+    "dependencies": {
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "lucide-react": "^0.542.0",
+        "next": "15.5.2",
+        "react": "19.1.0",
+        "react-dom": "19.1.0",
+        "shadcn": "^3.0.0",
+        "tailwind-merge": "^3.3.1"
+    },
+    "devDependencies": {
+        "@clove/config-eslint": "workspace:^",
+        "@clove/config-ts": "workspace:^",
+        "@tailwindcss/postcss": "^4",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "tailwindcss": "^4",
+        "typescript": "^5"
+    }
+}

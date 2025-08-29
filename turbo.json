@@ -7,8 +7,27 @@
         },
         "api#build": {
             "dependsOn": ["^build"],
-            "env": ["PORT", "API_ORIGIN", "DB_URL", "WEB_ORIGIN"],
+            "env": [
+                "PORT",
+                "API_ORIGIN",
+                "WEB_ORIGIN",
+                "DATABASE_MAX_RETRIES",
+                "DATABASE_URL",
+                "JWT_ISS",
+                "JWT_KID",
+                "REFRESH_TOKEN_EXPIRY",
+                "REDIS_URL",
+                "EMAIL_VERIFICATION_TOKEN_EXPIRY_MS",
+                "ACCESS_TOKEN_EXPIRY",
+                "RESEND_API_KEY",
+                "HMAC_256_SECRET_KEY",
+                "SESSION_LIMIT"
+            ],
             "outputs": ["dist/**"]
+        },
+        "web#build": {
+            "dependsOn": ["^build"],
+            "outputs": [".next/**", "!.next/cache/**"]
         },
         "db:deploy": {
             "cache": false
