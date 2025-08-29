@@ -40,16 +40,21 @@ export const signToken = (
 
 export const verifyToken = async (token: string): Promise<JWTVerifyResult<AuthJWTPayload>> => {
     try {
-        return jwtVerify(token, publicKey);
+        return await jwtVerify(token, publicKey);
     } catch (error) {
-        if (
-            error instanceof errors.JWTExpired ||
-            error instanceof errors.JWTInvalid ||
-            error instanceof errors.JWSSignatureVerificationFailed ||
-            error instanceof errors.JWTClaimValidationFailed
-        ) {
+        if (error instanceof errors.JWTExpired) {
             throw new CloveError(401, {
-                message: "Invalid or expired token",
+                message: "Token has expired",
+                details: error.message,
+            });
+        } else if (error instanceof errors.JWTClaimValidationFailed) {
+            throw new CloveError(401, {
+                message: "Token is not yet valid",
+                details: error.message,
+            });
+        } else if (error instanceof errors.JWTInvalid) {
+            throw new CloveError(401, {
+                message: "Token is either malformed or broken",
                 details: error.message,
             });
         }

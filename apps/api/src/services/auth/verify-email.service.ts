@@ -1,6 +1,5 @@
 import { randomUUID } from "crypto";
 import { constant } from "../../configs/constant.js";
-import { env } from "../../configs/env.js";
 import { prisma } from "../../db/index.js";
 import { findEmailInclueUser } from "../../db/queries/email.query.js";
 import { findToken } from "../../db/queries/token.query.js";
@@ -82,7 +81,7 @@ export const verifyEmailService = async ({
             type: "refresh",
             session_id: sessionId,
         },
-        env.REFRESH_TOKEN_EXPIRY
+        getExpiryDate(constant.REFRESH_TOKEN_EXPIRY_MS)
     );
 
     await prisma.$transaction(async (tx) => {

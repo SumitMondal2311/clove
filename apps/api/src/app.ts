@@ -34,7 +34,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
         return res.status(err.statusCode).json(err.toJSON());
     }
 
-    console.error("Unexpected error:" + err);
+    console.error("Unexpected error: " + err);
     res.status(500).json({
         message: "Internal server error: something went wrong",
     });

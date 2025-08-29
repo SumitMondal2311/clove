@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { constant } from "../../configs/constant.js";
-import { env } from "../../configs/env.js";
 import { authSchema } from "../../configs/validator.js";
 import { loginService } from "../../services/auth/login.service.js";
 import { CloveError } from "../../utils/clove-error.js";
+import { getExpiryDate } from "../../utils/get-expiry-date.js";
 import { getNormalizedIP } from "../../utils/get-normalized-ip.js";
 import { signToken } from "../../utils/jwt.js";
 
@@ -46,10 +46,11 @@ export const loginController = async (req: Request, res: Response, next: NextFun
             accessToken: await signToken(
                 {
                     type: "access",
-                    session_id: sessionId,
                     sub: user.id,
+                    session_id: sessionId,
+                    email,
                 },
-                env.ACCESS_TOKEN_EXPIRY
+                getExpiryDate(constant.ACCESS_TOKEN_EXPIRY_MS)
             ),
             message: "Logged in successfully",
         });

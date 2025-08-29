@@ -12,3 +12,21 @@ export const findSessionsByUserId = (
         orderBy,
     });
 };
+
+export const findSession = (id: string) => {
+    return prisma.session.findFirst({
+        where: {
+            id,
+            revoked: false,
+        },
+    });
+};
+
+export const findSessionByJti = (jti: string) => {
+    return prisma.session.findMany({
+        where: {
+            refreshJti: jti,
+            revoked: false,
+        },
+    });
+};

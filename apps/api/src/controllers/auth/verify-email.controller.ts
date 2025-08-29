@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { constant } from "../../configs/constant.js";
-import { env } from "../../configs/env.js";
 import { verifyEmailService } from "../../services/auth/verify-email.service.js";
 import { CloveError } from "../../utils/clove-error.js";
+import { getExpiryDate } from "../../utils/get-expiry-date.js";
 import { getNormalizedIP } from "../../utils/get-normalized-ip.js";
 import { signToken } from "../../utils/jwt.js";
 import { validateUUID } from "../../utils/validate-uuid.js";
@@ -64,8 +64,9 @@ export const verifyEmailController = async (req: Request, res: Response, next: N
                     type: "access",
                     session_id: sessionId,
                     sub: user.id,
+                    email: user.email,
                 },
-                env.ACCESS_TOKEN_EXPIRY
+                getExpiryDate(constant.ACCESS_TOKEN_EXPIRY_MS)
             ),
             message: "Email verified successfully.",
         });

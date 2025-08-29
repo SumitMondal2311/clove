@@ -117,7 +117,7 @@ export const loginService = async ({
             type: "refresh",
             jti: refreshJti,
         },
-        env.REFRESH_TOKEN_EXPIRY
+        getExpiryDate(constant.REFRESH_TOKEN_EXPIRY_MS)
     );
 
     await prisma.$transaction(async (tx) => {
