@@ -143,6 +143,11 @@ export const loginService = async ({
                         id: userId,
                     },
                 },
+                email: {
+                    connect: {
+                        id: emailRecord.id,
+                    },
+                },
             },
         });
         await tx.auditLog.create({

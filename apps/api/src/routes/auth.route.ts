@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
     loginController,
     logoutController,
+    refreshTokenController,
     signupController,
     verifyEmailController,
 } from "../controllers/auth/index.js";
@@ -12,6 +13,7 @@ export const authRouter = Router();
 
 authRouter.post("/signup", handleAsync(signupController));
 authRouter.post("/verify-email", handleAsync(verifyEmailController));
+authRouter.post("/refresh-token", handleAsync(refreshTokenController));
 authRouter.post("/login", handleAsync(loginController));
 
 authRouter.use(authMiddleware);

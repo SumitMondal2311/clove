@@ -92,7 +92,8 @@ model Email {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tokens Token[]
+  tokens   Token[]
+  sessions Session[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -103,15 +104,17 @@ model Session {
   id          String      @id @default(uuid()) @db.Uuid
   loginMethod LoginMethod @default(EMAIL)
   refreshJti  String      @unique // hashed
-  userId      String      @db.Uuid
+  emailId     String      @db.Uuid
   userAgent   String?
+  userId      String      @db.Uuid
   ipAddress   String?
   revoked     Boolean     @default(false)
   expiresAt   DateTime
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email Email @relation(fields: [emailId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -119,13 +122,13 @@ model Session {
 model Token {
   id        String    @id @default(uuid()) @db.Uuid
   userId    String    @db.Uuid
-  emailId   String    @db.Uuid
+  emailId   String?   @db.Uuid
   type      TokenType
   secret    String
   expiresAt DateTime
   createdAt DateTime  @default(now())
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   email Email? @relation(fields: [emailId], references: [id], onDelete: Cascade)
 
   @@index([userId])

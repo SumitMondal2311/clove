@@ -1,4 +1,6 @@
-import { Prisma, prisma } from "../index.js";
+import { constant } from "../../configs/constant.js";
+import { getExpiryDate } from "../../utils/get-expiry-date.js";
+import { LoginMethod, Prisma, prisma } from "../index.js";
 
 export const findSessionsByUserId = (
     userId: string,
@@ -22,11 +24,45 @@ export const findSession = (id: string) => {
     });
 };
 
+export const findSessionIncludeEmail = (id: string) => {
+    return prisma.session.findFirst({
+        where: {
+            id,
+            revoked: false,
+        },
+        include: {
+            email: true,
+        },
+    });
+};
+
 export const findSessionByJti = (jti: string) => {
     return prisma.session.findMany({
         where: {
             refreshJti: jti,
             revoked: false,
+        },
+    });
+};
+
+export const rotateRefreshToken = ({
+    loginMethod = "EMAIL",
+    id,
+    refreshJti,
+}: {
+    loginMethod?: LoginMethod;
+    id: string;
+    refreshJti: string;
+}) => {
+    return prisma.session.update({
+        where: {
+            loginMethod,
+            id,
+            revoked: false,
+        },
+        data: {
+            refreshJti,
+            expiresAt: getExpiryDate(constant.REFRESH_TOKEN_EXPIRY_MS),
         },
     });
 };

@@ -50,7 +50,7 @@ export const verifyEmailService = async ({
     }
 
     const { userId, emailId } = tokenRecord;
-    const emailRecord = await findEmailInclueUser(emailId);
+    const emailRecord = await findEmailInclueUser(emailId || "");
     if (!emailRecord) {
         throw new CloveError(404, {
             message: "Email not found",
@@ -108,6 +108,11 @@ export const verifyEmailService = async ({
                 user: {
                     connect: {
                         id: userId,
+                    },
+                },
+                email: {
+                    connect: {
+                        id: emailRecord.id,
                     },
                 },
             },

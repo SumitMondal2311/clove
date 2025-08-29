@@ -62,8 +62,6 @@ export const signupService = async ({
                         });
                     }
 
-                    await redis.set(redisKey.verificationRateLimit(email), "cooldown", "EX", 60);
-
                     userId = emailRecord.userId;
                     emailId = emailRecord.id;
                     status = "EMAIL_UNVERIFIED_RESENT";
@@ -136,6 +134,7 @@ export const signupService = async ({
         })
         .then(async () => {
             await sendVerificationEmail(email, encodeURIComponent(`${tokenId}.${tokenSecret}`));
+            await redis.set(redisKey.verificationRateLimit(email), "cooldown", "EX", 60);
         });
 
     return status;

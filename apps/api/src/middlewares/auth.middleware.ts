@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { findEmailByAddress } from "../db/queries/email.query.js";
-import { findSession } from "../db/queries/session.query.js";
+import { findSessionIncludeEmail } from "../db/queries/session.query.js";
 import { CloveError } from "../utils/clove-error.js";
 import { handleAsync } from "../utils/handle-async.js";
 import { verifyToken } from "../utils/jwt.js";
@@ -38,34 +37,25 @@ export const authMiddleware = handleAsync(
             );
         }
 
-        const emailRecord = await findEmailByAddress(email);
-        if (!emailRecord) {
+        const sessionRecord = await findSessionIncludeEmail(session_id);
+        if (!sessionRecord) {
             throw new CloveError(401, {
-                message: "Email not found",
-                details: "No email is associated with this token.",
-            });
-        }
-
-        if (emailRecord.userId !== sub) {
-            throw new CloveError(401, {
-                message: "Email and user mismatch",
-                details: "Stored email address does not belong to this user.",
-            });
-        }
-
-        const session = await findSession(session_id);
-        if (!session) {
-            throw new CloveError(401, {
-                message: "Session not found",
+                message: "Invalid session",
                 details: "No active session is associated with this token.",
             });
         }
 
-        const { primary } = emailRecord;
+        const emailRecord = sessionRecord.email;
+        if (sessionRecord.userId !== sub || emailRecord.email !== email) {
+            throw new CloveError(401, {
+                message: "Token claims mismatch",
+                details: "The user or email in the token does not match the stored session data.",
+            });
+        }
 
         req.authData = {
             user: {
-                primary,
+                primary: emailRecord.primary,
                 email,
                 id: sub,
             },
