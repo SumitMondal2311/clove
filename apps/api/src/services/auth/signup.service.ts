@@ -1,10 +1,10 @@
+import { prisma } from "@clove/database";
 import { hash } from "argon2";
 import { randomBytes, randomUUID } from "crypto";
 import { env } from "../../configs/env.js";
 import { redis } from "../../configs/redis.js";
-import { prisma } from "../../db/index.js";
-import { findEmailByAddress } from "../../db/queries/email.query.js";
 import { sendVerificationEmail } from "../../emails/service.js";
+import { findEmailByAddress } from "../../repositories/email.repository.js";
 import { CloveError } from "../../utils/clove-error.js";
 import { getExpiryDate } from "../../utils/get-expiry-date.js";
 import { getHmacSHA256 } from "../../utils/get-hmac-sha256.js";

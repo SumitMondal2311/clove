@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { constant } from "../../configs/constant.js";
 import { env } from "../../configs/env.js";
 import { redis } from "../../configs/redis.js";
-import { findSessionByJti, rotateRefreshToken } from "../../db/queries/session.query.js";
+import { findSessionByJti, rotateRefreshToken } from "../../repositories/session.repository.js";
 import { CloveError } from "../../utils/clove-error.js";
 import { getExpiryDate } from "../../utils/get-expiry-date.js";
 import { getTtl } from "../../utils/get-ttl.js";

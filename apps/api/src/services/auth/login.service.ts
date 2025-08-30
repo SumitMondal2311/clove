@@ -1,12 +1,12 @@
+import { prisma } from "@clove/database";
 import { verify } from "argon2";
 import { randomBytes, randomUUID } from "crypto";
 import { constant } from "../../configs/constant.js";
 import { env } from "../../configs/env.js";
-import { prisma } from "../../db/index.js";
-import { findLocalAccount } from "../../db/queries/account.query.js";
-import { findEmailByAddress } from "../../db/queries/email.query.js";
-import { findSessionsByUserId } from "../../db/queries/session.query.js";
 import { sendVerificationEmail } from "../../emails/service.js";
+import { findLocalAccount } from "../../repositories/account.repository.js";
+import { findEmailByAddress } from "../../repositories/email.repository.js";
+import { findSessionsByUserId } from "../../repositories/session.repository.js";
 import { CloveError } from "../../utils/clove-error.js";
 import { delay } from "../../utils/delay.js";
 import { getExpiryDate } from "../../utils/get-expiry-date.js";

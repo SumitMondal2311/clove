@@ -1,6 +1,6 @@
-import { env } from "../configs/env.js";
-import { delay } from "../utils/delay.js";
+import { setTimeout } from "timers/promises";
 import { prisma } from "./client.js";
+import { env } from "./env.js";
 
 export const reconnectDB = async (attempt = 1) => {
     try {
@@ -11,7 +11,7 @@ export const reconnectDB = async (attempt = 1) => {
             const wait = 2 ** attempt * 1000;
             console.warn("Failed reconnecting to database");
             console.warn(`Retrying in ${wait / 1000}s...`);
-            await delay(wait);
+            await setTimeout(wait);
             await reconnectDB(attempt + 1);
         } else {
             console.error("Database reconnection failed: ", error);

@@ -1,8 +1,8 @@
+import { prisma } from "@clove/database";
 import { randomUUID } from "crypto";
 import { constant } from "../../configs/constant.js";
-import { prisma } from "../../db/index.js";
-import { findEmailInclueUser } from "../../db/queries/email.query.js";
-import { findToken } from "../../db/queries/token.query.js";
+import { findEmailInclueUser } from "../../repositories/email.repository.js";
+import { findToken } from "../../repositories/token.repository.js";
 import { CloveError } from "../../utils/clove-error.js";
 import { getExpiryDate } from "../../utils/get-expiry-date.js";
 import { getHmacSHA256 } from "../../utils/get-hmac-sha256.js";

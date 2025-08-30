@@ -1,4 +1,4 @@
-import { env } from "../configs/env.js";
+import { env } from "./env.js";
 import { PrismaClient } from "./index.js";
 
 declare global {

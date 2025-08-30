@@ -4,6 +4,7 @@
     "type": "module",
     "exports": {
         "./node": "./node.json",
+        "./node-pkg": "./node-pkg.json",
         "./next": "./next.json"
     }
 }

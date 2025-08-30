@@ -1,7 +1,7 @@
+import { prisma } from "@clove/database";
 import { env } from "../../configs/env.js";
 import { redis } from "../../configs/redis.js";
-import { prisma } from "../../db/index.js";
-import { findSessionByJti } from "../../db/queries/session.query.js";
+import { findSessionByJti } from "../../repositories/session.repository.js";
 import { CloveError } from "../../utils/clove-error.js";
 import { getTtl } from "../../utils/get-ttl.js";
 import { verifyToken } from "../../utils/jwt.js";

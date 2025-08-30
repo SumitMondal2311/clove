@@ -5,17 +5,15 @@ export const envSchema = z.object({
     PORT: z.string().transform(Number),
     WEB_ORIGIN: z.string(),
     API_ORIGIN: z.string(),
-    DATABASE_MAX_RETRIES: z.string().transform(Number),
     HMAC_SHA256_SECRET_KEY: z.base64(),
-    DATABASE_URL: z.string(),
     JWT_KID: z.string(),
     JWT_ISS: z.string(),
     RESEND_API_KEY: z.string().optional(),
     REDIS_URL: z.string(),
-    ACCESS_TOKEN_EXPIRY: z.string().transform((str): number => eval(str)),
-    EMAIL_VERIFICATION_TOKEN_EXPIRY_MS: z.string().transform((str): number => eval(str)),
-    SESSION_LIMIT: z.string().transform((str): number => eval(str)),
-    REFRESH_TOKEN_EXPIRY: z.string().transform((str): number => eval(str)),
+    ACCESS_TOKEN_EXPIRY: z.string().transform(Number),
+    EMAIL_VERIFICATION_TOKEN_EXPIRY_MS: z.string().transform(Number),
+    SESSION_LIMIT: z.string().transform(Number),
+    REFRESH_TOKEN_EXPIRY: z.string().transform(Number),
 });
 
 export const authSchema = z.object({

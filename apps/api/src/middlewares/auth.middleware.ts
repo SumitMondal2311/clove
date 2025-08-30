@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { findSession } from "../db/queries/session.query.js";
+import { findSession } from "../repositories/session.repository.js";
 import { CloveError } from "../utils/clove-error.js";
 import { handleAsync } from "../utils/handle-async.js";
 import { verifyToken } from "../utils/jwt.js";

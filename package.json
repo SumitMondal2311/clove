@@ -5,11 +5,11 @@
         "build": "turbo run build",
         "check-types": "turbo run check-types",
         "clean": "turbo run clean",
-        "db:deploy": "pnpm --filter api db:deploy",
-        "db:generate": "pnpm --filter api db:generate",
-        "db:migrate": "pnpm --filter api db:migrate",
-        "db:push": "pnpm --filter api db:push",
-        "db:studio": "pnpm --filter api db:studio",
+        "db:deploy": "pnpm --filter @clove/database db:deploy",
+        "db:generate": "pnpm --filter @clove/database db:generate",
+        "db:migrate": "pnpm --filter @clove/database db:migrate",
+        "db:push": "pnpm --filter @clove/database db:push",
+        "db:studio": "pnpm --filter @clove/database db:studio",
         "dev": "turbo run dev",
         "docker:down": "docker-compose -f infra/docker/docker-compose.local.yml down",
         "docker:up": "docker-compose -f infra/docker/docker-compose.local.yml up -d",
@@ -21,7 +21,12 @@
     "lint-staged": {
         "**/*.{json,js,mjs,ts,jsx,tsx}": "prettier --write"
     },
+    "dependencies": {
+        "dotenv": "^17.2.1",
+        "zod": "^4.1.5"
+    },
     "devDependencies": {
+        "cross-env": "^10.0.0",
         "husky": "^9.1.7",
         "jiti": "^2.5.1",
         "lint-staged": "^16.1.5",

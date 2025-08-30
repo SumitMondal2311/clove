@@ -4,6 +4,7 @@
     "type": "module",
     "exports": {
         "./node": "./node.js",
+        "./node-pkg": "./node-pkg.js",
         "./next": "./next.js"
     },
     "devDependencies": {

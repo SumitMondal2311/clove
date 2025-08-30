@@ -1,4 +1,4 @@
-import { prisma } from "../index.js";
+import { prisma } from "@clove/database";
 
 export const findLocalAccount = (email: string) => {
     return prisma.account.findUnique({

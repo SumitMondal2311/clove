@@ -1,4 +1,4 @@
-import { findSessionIncludeEmail } from "../../db/queries/session.query.js";
+import { findSessionIncludeEmail } from "../../repositories/session.repository.js";
 import { CloveError } from "../../utils/clove-error.js";
 
 export const meService = async (

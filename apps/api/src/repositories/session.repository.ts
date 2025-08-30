@@ -1,6 +1,6 @@
-import { constant } from "../../configs/constant.js";
-import { getExpiryDate } from "../../utils/get-expiry-date.js";
-import { LoginMethod, Prisma, prisma } from "../index.js";
+import { LoginMethod, Prisma, prisma } from "@clove/database";
+import { constant } from "../configs/constant.js";
+import { getExpiryDate } from "../utils/get-expiry-date.js";
 
 export const findSessionsByUserId = (
     userId: string,

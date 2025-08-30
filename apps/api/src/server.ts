@@ -1,6 +1,6 @@
 import { app, startTime } from "./app.js";
+import { connectDB, disconnectDB } from "@clove/database";
 import { env } from "./configs/env.js";
-import { connectDB, disconnectDB } from "./db/lifecycle.js";
 
 (async () => {
     try {
