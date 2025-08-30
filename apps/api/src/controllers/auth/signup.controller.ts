@@ -5,17 +5,17 @@ import { CloveError } from "../../utils/clove-error.js";
 import { getNormalizedIP } from "../../utils/get-normalized-ip.js";
 
 export const signupController = async (req: Request, res: Response, next: NextFunction) => {
-    const validationResult = authSchema.safeParse(req.body);
-    if (!validationResult.success) {
+    const parsedSchema = authSchema.safeParse(req.body);
+    if (!parsedSchema.success) {
         return next(
             new CloveError(400, {
-                message: "Invalid input",
-                details: validationResult.error.issues[0].message,
+                message: parsedSchema.error.issues[0].message,
+                details: "Invalid input",
             })
         );
     }
 
-    const { email, password } = validationResult.data;
+    const { email, password } = parsedSchema.data;
     const status = await signupService({
         userAgent: req.headers["user-agent"],
         ipAddress: getNormalizedIP(req.ip || ""),

@@ -1,14 +1,38 @@
+import { Toaster } from "@/components/ui/sonner";
 import "@/styles/index.css";
-import { JetBrains_Mono, Outfit } from "next/font/google";
+import localFont from "next/font/local";
+import { QueryProvider } from "./query-provider";
 
-const outfit = Outfit({
+const outfit = localFont({
+    src: [
+        {
+            path: "./fonts/Outfit-Regular.ttf",
+            weight: "400",
+            style: "normal",
+        },
+        {
+            path: "./fonts/Outfit-Bold.ttf",
+            weight: "700",
+            style: "normal",
+        },
+    ],
     variable: "--font-outfit",
-    subsets: ["latin"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const jetbrainsMono = localFont({
+    src: [
+        {
+            path: "./fonts/JetBrainsMono-Regular.ttf",
+            weight: "400",
+            style: "normal",
+        },
+        {
+            path: "./fonts/JetBrainsMono-Bold.ttf",
+            weight: "700",
+            style: "normal",
+        },
+    ],
     variable: "--font-jetbrains-mono",
-    subsets: ["latin"],
 });
 
 export default function RootLayout({
@@ -18,7 +42,10 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${outfit.variable} ${jetbrainsMono.variable}`}>{children}</body>
+            <body className={`${outfit.variable} ${jetbrainsMono.variable}`}>
+                <QueryProvider>{children}</QueryProvider>
+                <Toaster />
+            </body>
         </html>
     );
 }

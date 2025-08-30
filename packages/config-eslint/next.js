@@ -19,6 +19,7 @@ export const config = [
         },
         rules: {
             ...pluginReact.configs.recommended.rules,
+            "react-hooks/exhaustive-deps": "off",
             "react/react-in-jsx-scope": "off",
             "react/no-unescaped-entities": "off",
         },

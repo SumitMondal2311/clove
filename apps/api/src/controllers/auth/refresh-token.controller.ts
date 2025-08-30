@@ -3,6 +3,7 @@ import { constant } from "../../configs/constant.js";
 import { refreshTokenService } from "../../services/auth/refresh-token.service.js";
 import { CloveError } from "../../utils/clove-error.js";
 import { signToken } from "../../utils/jwt.js";
+import { getExpiryDate } from "../../utils/get-expiry-date.js";
 
 export const refreshTokenController = async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies["__refresh_token__"];
@@ -33,7 +34,7 @@ export const refreshTokenController = async (req: Request, res: Response, next: 
                     type: "access",
                     email: user.email,
                 },
-                constant.ACCESS_TOKEN_EXPIRY_MS
+                getExpiryDate(constant.ACCESS_TOKEN_EXPIRY_MS)
             ),
         });
 };

@@ -12,8 +12,8 @@ export const loginController = async (req: Request, res: Response, next: NextFun
     if (!parsedSchema.success) {
         return next(
             new CloveError(400, {
-                message: "Invalid input",
-                details: parsedSchema.error.issues.map((i) => i.message).join(", "),
+                message: parsedSchema.error.issues[0].message,
+                details: "Invalid input",
             })
         );
     }
