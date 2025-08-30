@@ -5,11 +5,7 @@ declare global {
         interface Request {
             authData?: {
                 sessionId: string;
-                user: {
-                    primary: boolean;
-                    id: string;
-                    email: string;
-                };
+                userId: string;
             };
         }
     }

@@ -29,11 +29,7 @@ export const loginService = async ({
       }
     | {
           refreshToken: string;
-          user: {
-              email: string;
-              id: string;
-              primary: boolean;
-          };
+          userId: string;
           sessionId: string;
           status: "LOGIN_SUCCESS";
       }
@@ -112,10 +108,10 @@ export const loginService = async ({
     const sessionId = randomUUID();
     const refreshToken = await signToken(
         {
-            sub: userId,
-            session_id: sessionId,
-            type: "refresh",
             jti: refreshJti,
+            sub: userId,
+            typ: "refresh",
+            sid: sessionId,
         },
         getExpiryDate(constant.REFRESH_TOKEN_EXPIRY_MS)
     );
@@ -166,11 +162,7 @@ export const loginService = async ({
 
     return {
         refreshToken,
-        user: {
-            primary: emailRecord.primary,
-            email,
-            id: userId,
-        },
+        userId,
         sessionId,
         status: "LOGIN_SUCCESS",
     };

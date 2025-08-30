@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { constant } from "../../configs/constant.js";
 import { refreshTokenService } from "../../services/auth/refresh-token.service.js";
 import { CloveError } from "../../utils/clove-error.js";
-import { signToken } from "../../utils/jwt.js";
 import { getExpiryDate } from "../../utils/get-expiry-date.js";
+import { signToken } from "../../utils/jwt.js";
 
 export const refreshTokenController = async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies["__refresh_token__"];
@@ -16,7 +16,7 @@ export const refreshTokenController = async (req: Request, res: Response, next: 
         );
     }
 
-    const { user, newRefreshToken, sessionId } = await refreshTokenService(refreshToken);
+    const { newRefreshToken, userId, sessionId } = await refreshTokenService(refreshToken);
 
     res.clearCookie("__refresh_token__");
     res.status(200)
@@ -29,10 +29,9 @@ export const refreshTokenController = async (req: Request, res: Response, next: 
         .json({
             accessToken: await signToken(
                 {
-                    sub: user.id,
-                    session_id: sessionId,
-                    type: "access",
-                    email: user.email,
+                    typ: "access",
+                    sub: userId,
+                    sid: sessionId,
                 },
                 getExpiryDate(constant.ACCESS_TOKEN_EXPIRY_MS)
             ),

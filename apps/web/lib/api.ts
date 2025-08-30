@@ -4,6 +4,10 @@ export const signupApi = async (data: { email: string; password: string }) => {
     return apiClient.post("/auth/signup", data);
 };
 
+export const meApi = async () => {
+    return apiClient.get("/user/me");
+};
+
 export const verifyEmailApi = async (token: string) => {
     return apiClient.post(`/auth/verify-email?token=${token}`);
 };

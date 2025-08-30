@@ -32,7 +32,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
         });
     }
 
-    const { refreshToken, user, sessionId } = loginResult;
+    const { refreshToken, userId, sessionId } = loginResult;
 
     res.status(200)
         .cookie("__refresh_token__", refreshToken, {
@@ -42,13 +42,11 @@ export const loginController = async (req: Request, res: Response, next: NextFun
             sameSite: "strict",
         })
         .json({
-            user,
             accessToken: await signToken(
                 {
-                    type: "access",
-                    sub: user.id,
-                    session_id: sessionId,
-                    email,
+                    typ: "access",
+                    sub: userId,
+                    sid: sessionId,
                 },
                 getExpiryDate(constant.ACCESS_TOKEN_EXPIRY_MS)
             ),

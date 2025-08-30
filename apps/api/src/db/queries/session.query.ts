@@ -37,7 +37,7 @@ export const findSessionIncludeEmail = (id: string) => {
 };
 
 export const findSessionByJti = (jti: string) => {
-    return prisma.session.findMany({
+    return prisma.session.findFirst({
         where: {
             refreshJti: jti,
             revoked: false,

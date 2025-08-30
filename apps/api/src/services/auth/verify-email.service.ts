@@ -20,11 +20,7 @@ export const verifyEmailService = async ({
     tokenId: string;
 }): Promise<{
     refreshToken: string;
-    user: {
-        email: string;
-        id: string;
-        primary: boolean;
-    };
+    userId: string;
     sessionId: string;
 }> => {
     const tokenRecord = await findToken(tokenId);
@@ -78,8 +74,8 @@ export const verifyEmailService = async ({
         {
             jti: refreshJti,
             sub: userId,
-            type: "refresh",
-            session_id: sessionId,
+            typ: "refresh",
+            sid: sessionId,
         },
         getExpiryDate(constant.REFRESH_TOKEN_EXPIRY_MS)
     );
@@ -133,11 +129,7 @@ export const verifyEmailService = async ({
 
     return {
         sessionId,
-        user: {
-            primary: emailRecord.primary,
-            id: userId,
-            email: emailRecord.email,
-        },
+        userId,
         refreshToken,
     };
 };

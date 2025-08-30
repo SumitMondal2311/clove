@@ -43,7 +43,7 @@ export const verifyEmailController = async (req: Request, res: Response, next: N
         });
     }
 
-    const { refreshToken, user, sessionId } = await verifyEmailService({
+    const { refreshToken, userId, sessionId } = await verifyEmailService({
         userAgent: req.headers["user-agent"],
         ipAddress: getNormalizedIP(req.ip || ""),
         secret,
@@ -58,13 +58,11 @@ export const verifyEmailController = async (req: Request, res: Response, next: N
             sameSite: "strict",
         })
         .json({
-            user,
             accessToken: await signToken(
                 {
-                    type: "access",
-                    session_id: sessionId,
-                    sub: user.id,
-                    email: user.email,
+                    typ: "access",
+                    sub: userId,
+                    sid: sessionId,
                 },
                 getExpiryDate(constant.ACCESS_TOKEN_EXPIRY_MS)
             ),

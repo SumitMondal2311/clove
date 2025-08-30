@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { findSessionIncludeEmail } from "../db/queries/session.query.js";
+import { findSession } from "../db/queries/session.query.js";
 import { CloveError } from "../utils/clove-error.js";
 import { handleAsync } from "../utils/handle-async.js";
 import { verifyToken } from "../utils/jwt.js";
@@ -27,8 +27,8 @@ export const authMiddleware = handleAsync(
         }
 
         const { payload } = await verifyToken(accessToken);
-        const { email, sub, session_id, type } = payload;
-        if (!email || !sub || !session_id || type !== "access") {
+        const { sub, sid, typ } = payload;
+        if (!sub || !sid || typ !== "access") {
             return next(
                 new CloveError(401, {
                     message: "Invalid access token",
@@ -37,7 +37,7 @@ export const authMiddleware = handleAsync(
             );
         }
 
-        const sessionRecord = await findSessionIncludeEmail(session_id);
+        const sessionRecord = await findSession(sid);
         if (!sessionRecord) {
             throw new CloveError(401, {
                 message: "Invalid session",
@@ -45,21 +45,16 @@ export const authMiddleware = handleAsync(
             });
         }
 
-        const emailRecord = sessionRecord.email;
-        if (sessionRecord.userId !== sub || emailRecord.email !== email) {
+        if (sessionRecord.userId !== sub) {
             throw new CloveError(401, {
-                message: "Token claims mismatch",
-                details: "The user or email in the token does not match the stored session data.",
+                message: "Invalid token claim",
+                details: "The user in the token does not match the stored session data.",
             });
         }
 
         req.authData = {
-            user: {
-                primary: emailRecord.primary,
-                email,
-                id: sub,
-            },
-            sessionId: session_id,
+            userId: sub,
+            sessionId: sid,
         };
 
         next();

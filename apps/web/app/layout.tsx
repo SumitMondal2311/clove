@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import "@/styles/index.css";
 import localFont from "next/font/local";
 import { QueryProvider } from "./query-provider";
+import { UserProvider } from "./user-provider";
 
 const outfit = localFont({
     src: [
@@ -43,7 +44,9 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${outfit.variable} ${jetbrainsMono.variable}`}>
-                <QueryProvider>{children}</QueryProvider>
+                <QueryProvider>
+                    <UserProvider>{children}</UserProvider>
+                </QueryProvider>
                 <Toaster />
             </body>
         </html>

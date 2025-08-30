@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { userStore } from "./user.store";
 
 type AuthStoreType = {
     accessToken: string | null;
@@ -11,5 +12,6 @@ export const authStore = create<AuthStoreType>((set) => ({
     setAccessToken: (token) => set({ accessToken: token }),
     logout: () => {
         set({ accessToken: null });
+        userStore.setState({ user: null });
     },
 }));

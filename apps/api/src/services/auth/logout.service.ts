@@ -17,8 +17,8 @@ export const logoutService = async ({
     userAgent?: string;
 }) => {
     const { payload } = await verifyToken(refreshToken);
-    const { jti, sub, exp, session_id, type } = payload;
-    if (!session_id || !sub || !jti || type !== "refresh") {
+    const { jti, sub, exp, sid, typ } = payload;
+    if (!sid || !sub || !jti || typ !== "refresh") {
         throw new CloveError(401, {
             message: "Invalid refresh token",
             details: "Required claims are missing or invalid.",
@@ -37,7 +37,7 @@ export const logoutService = async ({
         await tx.session.updateMany({
             where: {
                 revoked: false,
-                id: session_id,
+                id: sid,
                 userId: sub,
             },
             data: {
